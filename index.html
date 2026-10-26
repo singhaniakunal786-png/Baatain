@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>बातें (Baatain) - Ultimate Addictive Messenger</title>
+    <title>बातें (Baatain) - Ultimate Pro Max Plus</title>
     <meta name="theme-color" content="#0f172a">
     
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Baatain%20Messenger%22%2C%22short_name%22%3A%22Baatain%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
@@ -54,6 +54,9 @@
         .chat-screen { position: absolute; inset: 0; width: 100%; height: 100%; background: var(--chat-wallpaper); background-size: cover; background-position: center; display: flex; flex-direction: column; z-index: 60; transform: translateX(100%); transition: 0.25s ease; }
         .chat-screen.open { transform: translateX(0); }
         
+        .network-banner { display: none; background: #ef4444; color: white; text-align: center; font-size: 11px; padding: 4px; font-weight: bold; }
+        .network-banner.active { display: block; }
+
         .pinned-banner { display: none; background: var(--card); padding: 8px 12px; border-bottom: 1px solid rgba(0,0,0,0.1); font-size: 12px; color: var(--text); align-items: center; justify-content: space-between; border-left: 4px solid #10b981; }
         .pinned-banner.active { display: flex; }
 
@@ -160,7 +163,7 @@
             <div class="contact-search-box">
                 <input type="text" id="contactSearchInput" placeholder="🔍 Dost khojein..." oninput="filterContacts()">
             </div>
-            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ All 15 Addictive Features Active</div>
+            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Speed Controls & Gradients Active</div>
             <div id="contactList" style="flex:1; overflow-y:auto; width:100%;"></div>
         </div>
 
@@ -172,8 +175,8 @@
         </div>
 
         <div class="content" id="sec2" style="padding: 20px; font-size: 13px; color: var(--text);">
-            <h3>Pro Features (1-15 Integrated):</h3>
-            <p style="margin-top:6px;">Animated typing bubbles, Waveform audio players, Custom wallpapers, Interactive polls, Secret disappearing messages, Quick reactions, Media galleries, Starred/Forward system, Pinned chats, Delete for everyone, Online presence, Ringing WebRTC calls, Audio notifications, Group admin controls & Encrypted messaging.</p>
+            <h3>Pro Features (Fully Upgraded):</h3>
+            <p style="margin-top:6px;">Audio speed control (1x, 1.5x, 2x), Custom emoji drawer, Gradient wallpapers, Auto-reconnect indicators, Message search highlighting, Sound effects toggle & more!</p>
         </div>
 
         <button class="fab" onclick="openModal()">+</button>
@@ -256,12 +259,12 @@
 
         <div class="modal" id="wallpaperModal">
             <div class="modal-box">
-                <h3>Chat Wallpaper Chunein</h3>
+                <h3>Chat Wallpaper & Gradients</h3>
                 <div style="display:flex; gap:10px; margin:8px 0; justify-content:center;">
-                    <div onclick="setWallpaperColor('#f1f5f9')" style="width:30px; height:30px; background:#f1f5f9; border-radius:50%; cursor:pointer; border:1px solid #cbd5e1;"></div>
-                    <div onclick="setWallpaperColor('#d1fae5')" style="width:30px; height:30px; background:#d1fae5; border-radius:50%; cursor:pointer;"></div>
-                    <div onclick="setWallpaperColor('#fed7aa')" style="width:30px; height:30px; background:#fed7aa; border-radius:50%; cursor:pointer;"></div>
-                    <div onclick="setWallpaperColor('#0f172a')" style="width:30px; height:30px; background:#0f172a; border-radius:50%; cursor:pointer;"></div>
+                    <div onclick="setWallpaperColor('#f1f5f9')" style="width:30px; height:30px; background:#f1f5f9; border-radius:50%; cursor:pointer; border:1px solid #cbd5e1;" title="Solid Light"></div>
+                    <div onclick="setWallpaperColor('#0f172a')" style="width:30px; height:30px; background:#0f172a; border-radius:50%; cursor:pointer;" title="Solid Dark"></div>
+                    <div onclick="setWallpaperColor('linear-gradient(135deg, #0f172a, #065f46)')" style="width:30px; height:30px; background:linear-gradient(135deg, #0f172a, #065f46); border-radius:50%; cursor:pointer;" title="Emerald Gradient"></div>
+                    <div onclick="setWallpaperColor('linear-gradient(135deg, #4c1d95, #0f172a)')" style="width:30px; height:30px; background:linear-gradient(135deg, #4c1d95, #0f172a); border-radius:50%; cursor:pointer;" title="Purple Gradient"></div>
                 </div>
                 <input type="file" id="wallpaperFileInput" accept="image/*" style="display:none;" onchange="setCustomWallpaperImage(event)">
                 <button onclick="document.getElementById('wallpaperFileInput').click()" style="width:100%; padding:10px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:600; margin-top:6px;">📷 Gallery Se Photo Lagayein</button>
@@ -304,6 +307,7 @@
         </div>
 
         <div class="chat-screen" id="chatScreen">
+            <div class="network-banner" id="networkBanner">⚠️ Waiting for network... Reconnecting</div>
             <header>
                 <div style="display:flex; align-items:center; gap:10px;">
                     <span onclick="closeChat()" style="cursor:pointer; font-size:20px;">←</span>
@@ -359,6 +363,9 @@
                 <span onclick="selectEmojiForChat('🔥')">🔥</span>
                 <span onclick="selectEmojiForChat('🎉')">🎉</span>
                 <span onclick="selectEmojiForChat('🙏')">🙏</span>
+                <span onclick="selectEmojiForChat('😎')">😎</span>
+                <span onclick="selectEmojiForChat('🚀')">🚀</span>
+                <span onclick="selectEmojiForChat('💡')">💡</span>
             </div>
 
             <div class="input-container">
@@ -422,10 +429,20 @@
         let savedWallpaper = localStorage.getItem('baatain_wallpaper');
         if(savedWallpaper) {
             document.addEventListener("DOMContentLoaded", () => {
-                document.getElementById('chatScreen').style.backgroundImage = savedWallpaper.startsWith('#') ? 'none' : `url('${savedWallpaper}')`;
-                if(savedWallpaper.startsWith('#')) document.getElementById('chatScreen').style.backgroundColor = savedWallpaper;
+                let screen = document.getElementById('chatScreen');
+                if(savedWallpaper.includes('gradient') || savedWallpaper.includes('rgb')) {
+                    screen.style.backgroundImage = savedWallpaper;
+                } else if(savedWallpaper.startsWith('#')) {
+                    screen.style.backgroundImage = 'none';
+                    screen.style.backgroundColor = savedWallpaper;
+                } else {
+                    screen.style.backgroundImage = `url('${savedWallpaper}')`;
+                }
             });
         }
+
+        window.addEventListener('online', () => { document.getElementById('networkBanner').classList.remove('active'); });
+        window.addEventListener('offline', () => { document.getElementById('networkBanner').classList.add('active'); });
 
         function startApp() {
             let uName = document.getElementById('userNameInput').value.trim();
@@ -646,11 +663,15 @@
         }
 
         function openWallpaperModal() { document.getElementById('wallpaperModal').classList.add('active'); }
-        function setWallpaperColor(color) {
+        function setWallpaperColor(val) {
             let screen = document.getElementById('chatScreen');
-            screen.style.backgroundImage = 'none';
-            screen.style.backgroundColor = color;
-            localStorage.setItem('baatain_wallpaper', color);
+            if(val.includes('gradient')) {
+                screen.style.backgroundImage = val;
+            } else {
+                screen.style.backgroundImage = 'none';
+                screen.style.backgroundColor = val;
+            }
+            localStorage.setItem('baatain_wallpaper', val);
             document.getElementById('wallpaperModal').classList.remove('active');
         }
 
@@ -1034,10 +1055,11 @@
                         <div class="wave-bar" style="animation-delay: 0.1s;"></div>
                         <div class="wave-bar" style="animation-delay: 0.5s;"></div>
                     </div>
-                    <div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
+                    <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
                         <button onclick="playCustomAudio('${uniqueId}', this)" style="background:#10b981; color:white; border:none; border-radius:50%; width:26px; height:26px; cursor:pointer; font-size:11px;">▶</button>
-                        <input type="range" id="range_${uniqueId}" value="0" max="100" style="width:90px; cursor:pointer;" oninput="seekAudio('${uniqueId}', this)">
-                        <span id="time_${uniqueId}" style="font-size:10px; color:var(--sub);">0:00</span>
+                        <input type="range" id="range_${uniqueId}" value="0" max="100" style="width:70px; cursor:pointer;" oninput="seekAudio('${uniqueId}', this)">
+                        <button onclick="changeAudioSpeed('${uniqueId}', this)" style="background:#334155; color:white; border:none; border-radius:4px; padding:2px 4px; font-size:10px; cursor:pointer;" title="Playback Speed">1x</button>
+                        <span id="time_${uniqueId}" style="font-size:9px; color:var(--sub);">0:00</span>
                     </div>`;
 
                     dbRef.push({text: voiceHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, time: Date.now()});
@@ -1067,6 +1089,20 @@
             } else {
                 aud.pause();
                 btn.innerText = "▶";
+            }
+        }
+
+        function changeAudioSpeed(audioId, speedBtn) {
+            let aud = document.getElementById(audioId);
+            if(aud.playbackRate === 1) {
+                aud.playbackRate = 1.5;
+                speedBtn.innerText = "1.5x";
+            } else if(aud.playbackRate === 1.5) {
+                aud.playbackRate = 2.0;
+                speedBtn.innerText = "2x";
+            } else {
+                aud.playbackRate = 1;
+                speedBtn.innerText = "1x";
             }
         }
 
@@ -1184,12 +1220,21 @@
             }
 
             let contentDiv = document.createElement('div');
+            let searchQuery = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : '';
+            
             if(isDeleted) {
                 contentDiv.innerHTML = `<i style="color:var(--sub);">🚫 Message deleted for everyone</i>`;
             } else if(isHtml) {
                 contentDiv.innerHTML = txt; 
             } else {
-                contentDiv.innerText = txt;
+                let displayedText = txt;
+                if(searchQuery && displayedText.toLowerCase().includes(searchQuery)) {
+                    let regex = new RegExp(`(${searchQuery})`, 'gi');
+                    displayedText = displayedText.replace(regex, `<span style="background:#f59e0b; color:black; padding:0 2px; border-radius:2px;">$1</span>`);
+                    contentDiv.innerHTML = displayedText;
+                } else {
+                    contentDiv.innerText = txt;
+                }
             }
             box.appendChild(contentDiv);
 
