@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>बातें (Baatain) - Text & Emoji Branding</title>
+    <title>बातें (Baatain) - Ultimate Pro Max</title>
     <meta name="theme-color" content="#0f172a">
     
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Baatain%20Messenger%22%2C%22short_name%22%3A%22Baatain%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
@@ -72,7 +72,10 @@
         @keyframes pulseWave { 0%, 100% { height: 4px; } 50% { height: 16px; } }
 
         .reply-quote { background: rgba(0,0,0,0.06); border-left: 3px solid #10b981; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 6px; color: var(--sub); }
-        .reactions-bar { display: flex; gap: 6px; margin-top: 4px; font-size: 12px; }
+        .reactions-bar { display: flex; gap: 6px; margin-top: 4px; font-size: 12px; flex-wrap: wrap; }
+
+        .emoji-picker-popup { display: none; position: absolute; bottom: 70px; left: 10px; background: var(--card); border: 1px solid rgba(0,0,0,0.15); border-radius: 16px; padding: 8px; gap: 8px; font-size: 18px; z-index: 80; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .emoji-picker-popup.active { display: flex; }
 
         .reply-preview { display: none; background: var(--card); padding: 8px 12px; border-left: 3px solid #10b981; font-size: 12px; color: var(--text); justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,0,0,0.05); }
         .reply-preview.active { display: flex; }
@@ -110,7 +113,7 @@
         .modal-box input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; background: var(--bg); color: var(--text); outline: none; }
     </style>
 </head>
-<body>
+<body class="dark">
     <div class="app">
         
         <div class="img-viewer" id="imgViewer" onclick="this.classList.remove('active')">
@@ -148,7 +151,7 @@
             <div class="contact-search-box">
                 <input type="text" id="contactSearchInput" placeholder="🔍 Dost khojein..." oninput="filterContacts()">
             </div>
-            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Global Audio Ringing & Voice Active</div>
+            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Enhanced Pro Features Enabled</div>
             <div id="contactList" style="flex:1; overflow-y:auto; width:100%;"></div>
         </div>
 
@@ -161,9 +164,9 @@
 
         <div class="content" id="sec2" style="padding: 20px; font-size: 13px; color: var(--text);">
             <h3>Pro Features:</h3>
-            <p style="margin-top:6px;">1. Audio Call Ringing & 2-Way Voice Streaming</p>
-            <p style="margin-top:4px;">2. Shared Database Room (1-to-1 Sync)</p>
-            <p style="margin-top:4px;">3. Voice Note Waveform & Video Calls</p>
+            <p style="margin-top:6px;">1. Custom Emoji Picker & Live Voice Player</p>
+            <p style="margin-top:4px;">2. Exact Last Seen Timestamps</p>
+            <p style="margin-top:4px;">3. Auto Dark/Light Theme & HD Audio Calls</p>
             <p style="margin-top:4px;">4. Pin, Star, Forward & Delete for Everyone</p>
         </div>
 
@@ -334,6 +337,16 @@
                 <div class="attach-item" onclick="setDisappearing()">⏳ Disappearing (15s)</div>
             </div>
 
+            <div class="emoji-picker-popup" id="emojiPickerPopup">
+                <span onclick="selectEmojiForChat('😊')">😊</span>
+                <span onclick="selectEmojiForChat('😂')">😂</span>
+                <span onclick="selectEmojiForChat('❤️')">❤️</span>
+                <span onclick="selectEmojiForChat('👍')">👍</span>
+                <span onclick="selectEmojiForChat('🔥')">🔥</span>
+                <span onclick="selectEmojiForChat('🎉')">🎉</span>
+                <span onclick="selectEmojiForChat('🙏')">🙏</span>
+            </div>
+
             <div class="input-container">
                 <div class="reply-preview" id="replyPreview">
                     <span id="replyPreviewText">Replying to...</span>
@@ -343,7 +356,7 @@
                     <input type="file" id="imgFile" accept="image/*" style="display:none;" onchange="sendImage(event)">
                     <button class="icon-btn" onclick="toggleAttach()">📎</button>
                     <input type="text" id="msgInput" placeholder="Message ya link likhein..." oninput="handleTyping()" onkeypress="if(event.key=='Enter')sendMsg()">
-                    <button class="icon-btn" onclick="insertEmoji('😊')">😊</button>
+                    <button class="icon-btn" onclick="toggleEmojiPicker()">😊</button>
                     <button class="send-btn" onclick="sendMsg()">➤</button>
                 </div>
             </div>
@@ -722,13 +735,13 @@
             dbRef.on('child_added', snap => {
                 let d = snap.val();
                 if(d.deleted) {
-                    appendMsg(snap.key, "🚫 *Yeh message delete kar diya gaya hai*", d.sender === myName ? 'out' : 'in', false, {}, true, null, d.sender, true, d.seenBy || {});
+                    appendMsg(snap.key, "🚫 *Yeh message delete kar diya gaya hai*", d.sender === myName ? 'out' : 'in', false, {}, true, null, d.sender, true, d.seenBy || {}, d.time);
                     return;
                 }
                 let decryptedText = d.isHtml ? d.text : decryptText(d.text);
                 let msgObj = {key: snap.key, text: decryptedText, ...d};
                 allMessagesCache.push(msgObj);
-                appendMsg(snap.key, decryptedText, d.sender === myName ? 'out' : 'in', d.isHtml, d.reactions || {}, d.seen || false, d.replyTo || null, d.sender, false, d.seenBy || {});
+                appendMsg(snap.key, decryptedText, d.sender === myName ? 'out' : 'in', d.isHtml, d.reactions || {}, d.seen || false, d.replyTo || null, d.sender, false, d.seenBy || {}, d.time);
                 
                 let seenByObj = d.seenBy || {};
                 if(!seenByObj[myName]) {
@@ -764,7 +777,9 @@
                     let pData = snap.val();
                     if(pData) {
                         if(pData.status === 'hidden' || pData.status === 'offline') {
-                            document.getElementById('chatSubStatus').innerText = "Offline / Last seen hidden";
+                            let lastSeenDate = new Date(pData.lastSeen || Date.now());
+                            let timeStr = lastSeenDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            document.getElementById('chatSubStatus').innerText = "Last seen at " + timeStr;
                         } else {
                             document.getElementById('chatSubStatus').innerText = "Online 🟢";
                         }
@@ -781,8 +796,14 @@
             document.getElementById('chatScreen').classList.remove('open'); 
         }
 
-        function toggleAttach() { document.getElementById('attachMenu').classList.toggle('active'); }
+        function toggleAttach() { document.getElementById('attachMenu').classList.toggle('active'); document.getElementById('emojiPickerPopup').classList.remove('active'); }
+        function toggleEmojiPicker() { document.getElementById('emojiPickerPopup').classList.toggle('active'); document.getElementById('attachMenu').classList.remove('active'); }
         
+        function selectEmojiForChat(em) {
+            document.getElementById('msgInput').value += em;
+            document.getElementById('emojiPickerPopup').classList.remove('active');
+        }
+
         function toggleSearchBox() {
             let box = document.getElementById('searchBarBox');
             box.classList.toggle('active');
@@ -795,7 +816,7 @@
             list.innerHTML = '';
             allMessagesCache.forEach(m => {
                 if(!m.deleted && m.text.toLowerCase().includes(q)) {
-                    appendMsg(m.key, m.text, m.sender === myName ? 'out' : 'in', m.isHtml, m.reactions || {}, m.seen || false, m.replyTo || null, m.sender, false, m.seenBy || {});
+                    appendMsg(m.key, m.text, m.sender === myName ? 'out' : 'in', m.isHtml, m.reactions || {}, m.seen || false, m.replyTo || null, m.sender, false, m.seenBy || {}, m.time);
                 }
             });
         }
@@ -872,6 +893,7 @@
             cancelReply();
             if(typingRef) typingRef.set(false);
             document.getElementById('attachMenu').classList.remove('active');
+            document.getElementById('emojiPickerPopup').classList.remove('active');
         }
 
         function sendImage(e) {
@@ -969,8 +991,8 @@
             document.getElementById('attachMenu').classList.remove('active');
         }
 
-        function insertEmoji(em) { document.getElementById('msgInput').value += em; }
         function openImgViewer(src) { document.getElementById('fullImg').src = src; document.getElementById('imgViewer').classList.add('active'); }
+        
         function addReaction(msgKey, emoji) {
             let cObj = contacts.find(c => c.name === activeChat);
             let key = "";
@@ -1027,7 +1049,7 @@
             alert("👁️ Seen by: " + (names || "Nobody yet"));
         }
 
-        function appendMsg(key, txt, cls, isHtml, reactions, seen, replyTo, sender, isDeleted, seenBy) {
+        function appendMsg(key, txt, cls, isHtml, reactions, seen, replyTo, sender, isDeleted, seenBy, msgTime) {
             let list = document.getElementById('msgList'), div = document.createElement('div');
             div.className = `bubble ${cls}`;
             
@@ -1065,14 +1087,17 @@
             if(!isDeleted) {
                 let seenCount = Object.keys(seenBy || {}).length;
                 let tickSymbol = seenCount > 1 ? '✓✓ <span style="color:#38bdf8;">✓</span>' : '✓✓';
+                let dateObj = new Date(msgTime || Date.now());
+                let timeString = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
                 let timeDiv = document.createElement('div');
                 timeDiv.className = 'msg-time';
-                timeDiv.innerHTML = `<span onclick="showSeenByDetails(${JSON.stringify(seenBy || {}).replace(/"/g, '&quot;')})" style="cursor:pointer;" title="Seen list">👁️ ${seenCount}</span> <span id="tick_${key}">${tickSymbol}</span> <span onclick="event.stopPropagation(); pinMessage('${isHtml ? "Media" : txt}')" style="cursor:pointer; margin-left:3px;" title="Pin">📌</span> <span onclick="event.stopPropagation(); starMessage('${isHtml ? "Media" : txt}', '${sender}')" style="cursor:pointer; margin-left:3px;" title="Star">⭐</span> <span onclick="event.stopPropagation(); openForwardModal('${isHtml ? "Media Message" : txt}')" style="cursor:pointer; margin-left:3px;" title="Forward">➡️</span> <span onclick="event.stopPropagation(); deleteForEveryone('${key}', '${sender}')" style="cursor:pointer; margin-left:3px; color:#ef4444;" title="Delete">🗑️</span>`;
+                timeDiv.innerHTML = `<span>${timeString}</span> <span onclick="showSeenByDetails(${JSON.stringify(seenBy || {}).replace(/"/g, '&quot;')})" style="cursor:pointer;" title="Seen list">👁️ ${seenCount}</span> <span id="tick_${key}">${tickSymbol}</span> <span onclick="event.stopPropagation(); pinMessage('${isHtml ? "Media" : txt}')" style="cursor:pointer; margin-left:3px;" title="Pin">📌</span> <span onclick="event.stopPropagation(); starMessage('${isHtml ? "Media" : txt}', '${sender}')" style="cursor:pointer; margin-left:3px;" title="Star">⭐</span> <span onclick="event.stopPropagation(); openForwardModal('${isHtml ? "Media Message" : txt}')" style="cursor:pointer; margin-left:3px;" title="Forward">➡️</span> <span onclick="event.stopPropagation(); deleteForEveryone('${key}', '${sender}')" style="cursor:pointer; margin-left:3px; color:#ef4444;" title="Delete">🗑️</span>`;
                 box.appendChild(timeDiv);
 
                 let reactBar = document.createElement('div');
                 reactBar.className = 'reactions-bar';
-                let reactHtml = `<span onclick="event.stopPropagation(); addReaction('${key}', '❤️')">❤️</span> <span onclick="event.stopPropagation(); addReaction('${key}', '👍')">👍</span> <span onclick="event.stopPropagation(); addReaction('${key}', '😂')">😂</span>`;
+                let reactHtml = `<span onclick="event.stopPropagation(); addReaction('${key}', '❤️')">❤️</span> <span onclick="event.stopPropagation(); addReaction('${key}', '👍')">👍</span> <span onclick="event.stopPropagation(); addReaction('${key}', '🔥')">🔥</span> <span onclick="event.stopPropagation(); addReaction('${key}', '😂')">😂</span>`;
                 for(let em in reactions) {
                     reactHtml += ` <span style="background:rgba(0,0,0,0.05); padding:1px 4px; border-radius:4px;">${em} ${reactions[em]}</span>`;
                 }
