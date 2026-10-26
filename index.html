@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>बातें (Baatain) - Logo & Audio Call Fixed</title>
+    <title>बातें (Baatain) - Ultimate Pro Max</title>
     <meta name="theme-color" content="#0f172a">
     
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Baatain%20Messenger%22%2C%22short_name%22%3A%22Baatain%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
@@ -146,7 +146,7 @@
             <div class="contact-search-box">
                 <input type="text" id="contactSearchInput" placeholder="🔍 Dost khojein..." oninput="filterContacts()">
             </div>
-            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Global Audio Call & Chat Active</div>
+            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Global Audio Ringing & Voice Active</div>
             <div id="contactList" style="flex:1; overflow-y:auto; width:100%;"></div>
         </div>
 
@@ -159,7 +159,7 @@
 
         <div class="content" id="sec2" style="padding: 20px; font-size: 13px; color: var(--text);">
             <h3>Pro Features:</h3>
-            <p style="margin-top:6px;">1. Fixed Audio Call & Notification Ringing</p>
+            <p style="margin-top:6px;">1. Audio Call Ringing & 2-Way Voice Streaming</p>
             <p style="margin-top:4px;">2. Shared Database Room (1-to-1 Sync)</p>
             <p style="margin-top:4px;">3. Voice Note Waveform & Video Calls</p>
             <p style="margin-top:4px;">4. Pin, Star, Forward & Delete for Everyone</p>
@@ -272,13 +272,15 @@
             
             <div id="audioCallView" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:15px;">
                 <div class="avatar" id="callAvatarIcon" style="width:90px; height:90px; font-size:36px;">📞</div>
-                <div style="font-size:18px; font-weight:600;" id="callUserNameDisplay">Connecting...</div>
+                <div style="font-size:18px; font-weight:600;" id="callUserNameDisplay">Ringing...</div>
             </div>
 
             <div class="video-grid" id="videoGridContainer" style="display:none;">
                 <video id="remoteVideo" autoplay playsinline></video>
                 <video id="localVideo" autoplay playsinline muted></video>
             </div>
+
+            <audio id="remoteAudioElement" autoplay></audio>
 
             <div style="display:flex; gap:15px; margin-bottom:20px; align-items:center; justify-content:center;">
                 <button onclick="toggleMuteMic()" id="muteMicBtn" style="width: 45px; height: 45px; background: #334155; border-radius: 50%; border: none; color: white; font-size: 18px; cursor: pointer;" title="Mute Mic">🎤</button>
@@ -429,13 +431,13 @@
                             document.getElementById('callScreen').classList.add('active');
                             
                             if(data.callType === 'audio') {
-                                document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL";
+                                document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL (Connected)";
                                 document.getElementById('audioCallView').style.display = 'flex';
                                 document.getElementById('videoGridContainer').style.display = 'none';
                                 document.getElementById('callUserNameDisplay').innerText = data.caller;
                                 document.getElementById('callAvatarIcon').innerText = data.caller[0];
                             } else {
-                                document.getElementById('callTypeTitle').innerText = "📹 LIVE VIDEO CALL";
+                                document.getElementById('callTypeTitle').innerText = "📹 LIVE VIDEO CALL (Connected)";
                                 document.getElementById('audioCallView').style.display = 'none';
                                 document.getElementById('videoGridContainer').style.display = 'flex';
                             }
@@ -451,7 +453,13 @@
 
                                 peerConnection.ontrack = event => {
                                     remoteStream = event.streams[0];
-                                    if(data.callType === 'video') document.getElementById('remoteVideo').srcObject = remoteStream;
+                                    if(data.callType === 'audio') {
+                                        let remoteAudio = document.getElementById('remoteAudioElement');
+                                        remoteAudio.srcObject = remoteStream;
+                                        remoteAudio.play().catch(e => console.log(e));
+                                    } else {
+                                        document.getElementById('remoteVideo').srcObject = remoteStream;
+                                    }
                                 };
 
                                 let callRef = db.ref("calls/" + callKey);
@@ -1082,7 +1090,7 @@
             document.getElementById('callScreen').classList.add('active');
             
             if(type === 'audio') {
-                document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL";
+                document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL (Ringing...)";
                 document.getElementById('audioCallView').style.display = 'flex';
                 document.getElementById('videoGridContainer').style.display = 'none';
                 document.getElementById('callUserNameDisplay').innerText = activeChat;
@@ -1114,7 +1122,14 @@
 
                 peerConnection.ontrack = event => {
                     remoteStream = event.streams[0];
-                    if(type === 'video') document.getElementById('remoteVideo').srcObject = remoteStream;
+                    if(type === 'audio') {
+                        let remoteAudio = document.getElementById('remoteAudioElement');
+                        remoteAudio.srcObject = remoteStream;
+                        remoteAudio.play().catch(e => console.log(e));
+                        document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL (Connected)";
+                    } else {
+                        document.getElementById('remoteVideo').srcObject = remoteStream;
+                    }
                 };
 
                 let callRef = db.ref("calls/" + callKey);
@@ -1130,6 +1145,9 @@
                     let ans = snap.val();
                     if (ans && !peerConnection.currentRemoteDescription) {
                         await peerConnection.setRemoteDescription(new RTCSessionDescription(ans));
+                        if(type === 'audio') {
+                            document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL (Connected)";
+                        }
                     }
                 });
 
