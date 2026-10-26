@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>बातें (Baatain) - Logo Fixed</title>
+    <title>बातें (Baatain) - Text & Emoji Branding</title>
     <meta name="theme-color" content="#0f172a">
     
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Baatain%20Messenger%22%2C%22short_name%22%3A%22Baatain%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
@@ -28,7 +28,7 @@
         .app { width: 100%; height: 100%; max-width: 480px; max-height: 100vh; background: var(--bg); display: flex; flex-direction: column; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.8); transition: 0.3s; }
         
         .screen { position: absolute; inset: 0; background: linear-gradient(135deg, #0f172a, #1e293b); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; color: white; }
-        .logo-circle { width: 90px; height: 90px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; font-size: 42px; box-shadow: 0 0 25px rgba(16,185,129,0.5); margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.2); }
+        .brand-title { font-size: 32px; font-weight: 800; color: #10b981; margin-bottom: 6px; letter-spacing: 0.5px; text-shadow: 0 0 15px rgba(16,185,129,0.4); }
         .btn { padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 24px; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.4); }
 
         header { background: var(--primary); color: white; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 10; width: 100%; }
@@ -119,16 +119,15 @@
         </div>
 
         <div class="screen" id="loginScreen">
-            <div class="logo-circle">💬</div>
-            <h1 style="font-size:24px; margin-bottom:4px;">बातें (Baatain)</h1>
-            <p style="color:#94a3b8; font-size:13px; margin-bottom:15px;">Apna naam ya ID daalkar live judein</p>
+            <div class="brand-title">💬 बातें (Baatain) ✨</div>
+            <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Apna naam ya ID daalkar live judein</p>
             <input type="text" id="userNameInput" placeholder="Apna unique naam (jaise: Ak ya Kumar)" style="padding:10px; width:80%; max-width:240px; border-radius:20px; border:none; text-align:center; margin-bottom:15px; outline:none;">
             <button class="btn" onclick="startApp()">App Shuru Karein</button>
         </div>
 
         <header>
-            <div style="display:flex; align-items:center; gap:8px;">
-                <div style="width:32px; height:32px; border-radius:50%; background:#10b981; display:flex; align-items:center; justify-content:center; font-size:16px;">💬</div>
+            <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:18px;">💬</span>
                 <div style="font-weight:700; font-size:16px; display:flex; align-items:center; gap:4px;">बातें <span style="background:#f59e0b; font-size:9px; padding:1px 5px; border-radius:6px; color:white;">PRO</span></div>
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
