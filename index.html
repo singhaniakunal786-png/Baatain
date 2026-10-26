@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>बातें (Baatain) - Logo & Audio Call Fixed</title>
+    <meta name="theme-color" content="#0f172a">
+    
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Baatain%20Messenger%22%2C%22short_name%22%3A%22Baatain%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --sub: #64748b;
+            --primary: #0f172a; --accent: #10b981; --bubble-out: #ccfbf1; --bubble-in: #ffffff;
+            --chat-wallpaper: #f1f5f9;
+        }
+        body.dark {
+            --bg: #090d16; --card: #1e293b; --text: #f1f5f9; --sub: #94a3b8;
+            --primary: #0f172a; --accent: #10b981; --bubble-out: #065f46; --bubble-in: #1e293b;
+            --chat-wallpaper: #090d16;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #0f172a; display: flex; justify-content: center; align-items: center; }
+        
+        .app { width: 100%; height: 100%; max-width: 480px; max-height: 100vh; background: var(--bg); display: flex; flex-direction: column; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.8); transition: 0.3s; }
+        
+        .screen { position: absolute; inset: 0; background: linear-gradient(135deg, #0f172a, #1e293b); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; color: white; }
+        .logo-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 20px rgba(16,185,129,0.5); margin-bottom: 16px; border: 3px solid rgba(255,255,255,0.2); }
+        .btn { padding: 12px 24px; background: #10b981; color: white; border: none; border-radius: 24px; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.4); }
+
+        header { background: var(--primary); color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 10; width: 100%; }
+        
+        .tabs { display: flex; background: var(--primary); border-top: 1px solid rgba(255,255,255,0.1); width: 100%; }
+        .tab { flex: 1; text-align: center; padding: 10px; font-size: 12px; font-weight: 600; color: #94a3b8; cursor: pointer; border-bottom: 3px solid transparent; }
+        .tab.active { color: #10b981; border-bottom-color: #10b981; }
+
+        .content { flex: 1; width: 100%; overflow-y: auto; display: none; flex-direction: column; }
+        .content.active { display: flex; }
+        
+        .contact-search-box { padding: 10px 14px; background: var(--card); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .contact-search-box input { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 20px; font-size: 13px; outline: none; background: var(--bg); color: var(--text); }
+
+        .item { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; background: var(--card); width: 100%; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #10b981; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 14px; flex-shrink: 0; position: relative; }
+        .online-dot { width: 12px; height: 12px; background: #10b981; border: 2px solid white; border-radius: 50%; position: absolute; bottom: 0; right: 0; }
+
+        .fab { position: absolute; bottom: 24px; right: 24px; width: 54px; height: 54px; background: #10b981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; border: none; box-shadow: 0 4px 15px rgba(16,185,129,0.5); z-index: 50; }
+        
+        .chat-screen { position: absolute; inset: 0; width: 100%; height: 100%; background: var(--chat-wallpaper); background-size: cover; background-position: center; display: flex; flex-direction: column; z-index: 60; transform: translateX(100%); transition: 0.25s ease; }
+        .chat-screen.open { transform: translateX(0); }
+        
+        .pinned-banner { display: none; background: var(--card); padding: 8px 12px; border-bottom: 1px solid rgba(0,0,0,0.1); font-size: 12px; color: var(--text); align-items: center; justify-content: space-between; border-left: 4px solid #10b981; }
+        .pinned-banner.active { display: flex; }
+
+        .search-bar-box { display: none; background: var(--card); padding: 8px 12px; border-bottom: 1px solid rgba(0,0,0,0.1); align-items: center; gap: 8px; }
+        .search-bar-box.active { display: flex; }
+        .search-bar-box input { flex: 1; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: var(--bg); color: var(--text); }
+
+        .messages { flex: 1; width: 100%; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 85px; }
+        
+        .bubble { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 14px; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); position: relative; cursor: pointer; }
+        .in { background: var(--bubble-in); color: var(--text); align-self: flex-start; }
+        .out { background: var(--bubble-out); color: var(--text); align-self: flex-end; }
+        .bubble img { max-width: 100%; border-radius: 8px; margin-top: 4px; }
+        .msg-time { font-size: 9px; color: var(--sub); text-align: right; margin-top: 3px; display: flex; justify-content: flex-end; gap: 2px; align-items: center; }
+
+        .wave-bars { display: flex; align-items: center; gap: 2px; height: 16px; margin: 4px 0; }
+        .wave-bar { width: 3px; background: #10b981; border-radius: 2px; animation: pulseWave 1.2s infinite ease-in-out; }
+        @keyframes pulseWave { 0%, 100% { height: 4px; } 50% { height: 16px; } }
+
+        .reply-quote { background: rgba(0,0,0,0.06); border-left: 3px solid #10b981; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 6px; color: var(--sub); }
+        .reactions-bar { display: flex; gap: 6px; margin-top: 4px; font-size: 12px; }
+
+        .reply-preview { display: none; background: var(--card); padding: 8px 12px; border-left: 3px solid #10b981; font-size: 12px; color: var(--text); justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,0,0,0.05); }
+        .reply-preview.active { display: flex; }
+
+        .poll-box { background: var(--bubble-in); padding: 10px; border-radius: 10px; margin-top: 4px; border: 1px solid rgba(0,0,0,0.1); }
+        .poll-option { background: var(--bg); padding: 6px 10px; border-radius: 6px; margin-top: 6px; cursor: pointer; font-size: 13px; color: var(--text); }
+
+        .attach-menu { display: none; position: absolute; bottom: 75px; left: 10px; background: var(--card); border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 8px; width: 190px; z-index: 70; flex-direction: column; gap: 4px; box-shadow: 0 -4px 15px rgba(0,0,0,0.15); }
+        .attach-menu.active { display: flex; }
+        .attach-item { padding: 8px; font-size: 13px; color: var(--text); cursor: pointer; border-radius: 6px; }
+        .attach-item:hover { background: rgba(16,185,129,0.1); color: #10b981; }
+
+        .input-container { position: absolute; bottom: 12px; left: 10px; right: 10px; background: var(--primary); border-radius: 24px; display: flex; flex-direction: column; z-index: 65; box-shadow: 0 4px 15px rgba(0,0,0,0.2); overflow: hidden; }
+        .input-bar { padding: 8px 12px; display: flex; align-items: center; gap: 8px; width: 100%; }
+        .input-bar input { flex: 1; padding: 10px 14px; padding-right: 40px; border: none; border-radius: 20px; outline: none; background: white; font-size: 14px; color: #0f172a; }
+        .icon-btn { background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; padding: 0 4px; }
+        .send-btn { background: #10b981; color: white; border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+        .media-gallery { display: none; position: absolute; inset: 0; background: var(--bg); z-index: 130; flex-direction: column; padding: 15px; }
+        .media-gallery.active { display: flex; }
+
+        .call-screen { display: none; position: absolute; inset: 0; width: 100%; height: 100%; background: #0f172a; z-index: 120; flex-direction: column; justify-content: space-between; align-items: center; padding: 30px; color: white; text-align: center; }
+        .call-screen.active { display: flex; }
+        .video-grid { width: 100%; flex: 1; display: flex; flex-direction: column; gap: 10px; justify-content: center; align-items: center; position: relative; }
+        video { width: 100%; max-height: 45vh; background: #1e293b; border-radius: 12px; object-fit: cover; }
+        #localVideo { width: 110px; height: 150px; position: absolute; bottom: 20px; right: 20px; border-radius: 8px; border: 2px solid white; z-index: 10; }
+
+        .img-viewer { display: none; position: absolute; inset: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 150; justify-content: center; align-items: center; flex-direction: column; padding: 20px; }
+        .img-viewer.active { display: flex; }
+        .img-viewer img { max-width: 100%; max-height: 80vh; border-radius: 8px; object-fit: contain; }
+
+        .modal { display: none; position: absolute; inset: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 110; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-box { background: var(--card); color: var(--text); width: 85%; max-width: 340px; padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .modal-box input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; background: var(--bg); color: var(--text); outline: none; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        
+        <div class="img-viewer" id="imgViewer" onclick="this.classList.remove('active')">
+            <div style="position: absolute; top: 20px; right: 20px; color: white; font-size: 26px; cursor: pointer;">✕</div>
+            <img id="fullImg" src="" alt="Full">
+        </div>
+
+        <div class="screen" id="loginScreen">
+            <img src="https://i.ibb.co/3yk55N5/5369.png" alt="Baatain Logo" class="logo-img">
+            <h1 style="font-size:24px; margin-bottom:4px;">बातें (Baatain)</h1>
+            <p style="color:#94a3b8; font-size:13px; margin-bottom:15px;">Apna naam ya ID daalkar live judein</p>
+            <input type="text" id="userNameInput" placeholder="Apna unique naam (jaise: Ak ya Kumar)" style="padding:10px; width:80%; max-width:240px; border-radius:20px; border:none; text-align:center; margin-bottom:15px; outline:none;">
+            <button class="btn" onclick="startApp()">App Shuru Karein</button>
+        </div>
+
+        <header>
+            <div style="font-weight:700; font-size:18px;">बातें <span style="background:#f59e0b; font-size:10px; padding:2px 6px; border-radius:8px;">PRO</span></div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <span onclick="openStarredModal()" style="cursor:pointer; font-size:16px;" title="Starred">⭐</span>
+                <span onclick="openWallpaperModal()" style="cursor:pointer; font-size:16px;" title="Wallpaper">🎨</span>
+                <span onclick="openProfileModal()" style="cursor:pointer; font-size:16px;" title="Profile">⚙️</span>
+                <span onclick="toggleDark()" style="cursor:pointer; font-size:18px;" title="Dark Mode">🌙</span>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(0)">CHATS</div>
+            <div class="tab" onclick="switchTab(1)">STATUS</div>
+            <div class="tab" onclick="switchTab(2)">INFO</div>
+        </div>
+
+        <div class="content active" id="sec0">
+            <div class="contact-search-box">
+                <input type="text" id="contactSearchInput" placeholder="🔍 Dost khojein..." oninput="filterContacts()">
+            </div>
+            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Global Audio Call & Chat Active</div>
+            <div id="contactList" style="flex:1; overflow-y:auto; width:100%;"></div>
+        </div>
+
+        <div class="content" id="sec1" style="padding: 16px;">
+            <div class="item" style="border-radius:12px;" onclick="addStatus()">
+                <div class="avatar">➕</div>
+                <div><b>Mera Status (24h)</b><div style="font-size:12px; color:var(--sub);" id="statusText">Tap to upload status</div></div>
+            </div>
+        </div>
+
+        <div class="content" id="sec2" style="padding: 20px; font-size: 13px; color: var(--text);">
+            <h3>Pro Features:</h3>
+            <p style="margin-top:6px;">1. Fixed Audio Call & Notification Ringing</p>
+            <p style="margin-top:4px;">2. Shared Database Room (1-to-1 Sync)</p>
+            <p style="margin-top:4px;">3. Voice Note Waveform & Video Calls</p>
+            <p style="margin-top:4px;">4. Pin, Star, Forward & Delete for Everyone</p>
+        </div>
+
+        <button class="fab" onclick="openModal()">+</button>
+
+        <div class="modal" id="modal">
+            <div class="modal-box">
+                <h3>Naya Jodein</h3>
+                <button onclick="openAddContact()" style="width:100%; padding:10px; margin:6px 0; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:600;">Naya Dost Jodein (ID)</button>
+                <button onclick="openCreateGroup()" style="width:100%; padding:10px; margin:6px 0; background:#0f172a; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:600;">Naya Group Banayein</button>
+                <button onclick="closeModal()" style="width:100%; padding:8px; margin-top:10px; background:#cbd5e1; border:none; border-radius:8px; cursor:pointer;">Radd</button>
+            </div>
+        </div>
+
+        <div class="modal" id="contactModal">
+            <div class="modal-box">
+                <h3>Dost ki ID Jodein</h3>
+                <input type="text" id="contactNameInput" placeholder="Dost ka exact naam">
+                <div style="display:flex; justify-content:flex-end; gap:8px;">
+                    <button onclick="document.getElementById('contactModal').classList.remove('active')" style="padding:8px 14px; background:#cbd5e1; border:none; border-radius:6px; cursor:pointer;">Radd</button>
+                    <button onclick="saveContact()" style="padding:8px 14px; background:#10b981; color:white; border:none; border-radius:6px; cursor:pointer;">Jodein</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="groupModal">
+            <div class="modal-box">
+                <h3>Custom Group Banayein</h3>
+                <input type="text" id="groupNameInput" placeholder="Group ka naam">
+                <div style="display:flex; justify-content:flex-end; gap:8px;">
+                    <button onclick="document.getElementById('groupModal').classList.remove('active')" style="padding:8px 14px; background:#cbd5e1; border:none; border-radius:6px; cursor:pointer;">Radd</button>
+                    <button onclick="saveGroup()" style="padding:8px 14px; background:#10b981; color:white; border:none; border-radius:6px; cursor:pointer;">Create</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="profileModal">
+            <div class="modal-box">
+                <h3>User Profile & Privacy</h3>
+                <label style="font-size:11px; color:var(--sub);">Naam / ID:</label>
+                <input type="text" id="profileNameEdit" disabled>
+                <label style="font-size:11px; color:var(--sub);">Bio / Status:</label>
+                <input type="text" id="profileBioEdit" placeholder="Cloud User 🚀">
+                <div style="margin:10px 0; font-size:13px; display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" id="hideOnlineToggle" style="width:16px; height:16px;">
+                    <label for="hideOnlineToggle">Hide Online Status</label>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+                    <button onclick="document.getElementById('profileModal').classList.remove('active')" style="padding:8px 14px; background:#cbd5e1; border:none; border-radius:6px; cursor:pointer;">Radd</button>
+                    <button onclick="saveProfile()" style="padding:8px 14px; background:#10b981; color:white; border:none; border-radius:6px; cursor:pointer;">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="groupAdminModal">
+            <div class="modal-box">
+                <h3>👥 Group Settings & Seen Info</h3>
+                <input type="text" id="newMemberInput" placeholder="Naye member ka naam">
+                <button onclick="addGroupMember()" style="width:100%; padding:8px; background:#10b981; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:600; margin-top:6px;">Member Jodein</button>
+                <div id="groupMemberList" style="margin-top:12px; font-size:13px; max-height:120px; overflow-y:auto; display:flex; flex-direction:column; gap:4px;"></div>
+                <button onclick="document.getElementById('groupAdminModal').classList.remove('active')" style="width:100%; padding:8px; margin-top:12px; background:#cbd5e1; border:none; border-radius:8px; cursor:pointer;">Band Karein</button>
+            </div>
+        </div>
+
+        <div class="modal" id="starredModal">
+            <div class="modal-box" style="max-height: 80vh; overflow-y: auto;">
+                <h3>⭐ Starred Messages</h3>
+                <div id="starredListContainer" style="margin-top: 10px; font-size: 13px; display:flex; flex-direction:column; gap:6px;"></div>
+                <button onclick="document.getElementById('starredModal').classList.remove('active')" style="width:100%; padding:8px; margin-top:12px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer;">Band Karein</button>
+            </div>
+        </div>
+
+        <div class="modal" id="forwardModal">
+            <div class="modal-box" style="max-height: 80vh; overflow-y: auto;">
+                <h3>📤 Message Kisko Forward Karein?</h3>
+                <div id="forwardListContainer" style="margin-top: 10px; display:flex; flex-direction:column; gap:6px;"></div>
+                <button onclick="document.getElementById('forwardModal').classList.remove('active')" style="width:100%; padding:8px; margin-top:12px; background:#cbd5e1; border:none; border-radius:8px; cursor:pointer;">Radd</button>
+            </div>
+        </div>
+
+        <div class="modal" id="wallpaperModal">
+            <div class="modal-box">
+                <h3>Chat Wallpaper Chunein</h3>
+                <div style="display:flex; gap:10px; margin:8px 0; justify-content:center;">
+                    <div onclick="setWallpaperColor('#f1f5f9')" style="width:30px; height:30px; background:#f1f5f9; border-radius:50%; cursor:pointer; border:1px solid #cbd5e1;"></div>
+                    <div onclick="setWallpaperColor('#d1fae5')" style="width:30px; height:30px; background:#d1fae5; border-radius:50%; cursor:pointer;"></div>
+                    <div onclick="setWallpaperColor('#fed7aa')" style="width:30px; height:30px; background:#fed7aa; border-radius:50%; cursor:pointer;"></div>
+                    <div onclick="setWallpaperColor('#0f172a')" style="width:30px; height:30px; background:#0f172a; border-radius:50%; cursor:pointer;"></div>
+                </div>
+                <input type="file" id="wallpaperFileInput" accept="image/*" style="display:none;" onchange="setCustomWallpaperImage(event)">
+                <button onclick="document.getElementById('wallpaperFileInput').click()" style="width:100%; padding:10px; background:#10b981; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:600; margin-top:6px;">📷 Gallery Se Photo Lagayein</button>
+                <button onclick="document.getElementById('wallpaperModal').classList.remove('active')" style="width:100%; padding:8px; margin-top:8px; background:#cbd5e1; border:none; border-radius:8px; cursor:pointer;">Band Karein</button>
+            </div>
+        </div>
+
+        <div class="media-gallery" id="mediaGalleryScreen">
+            <header style="background:var(--primary); margin-bottom:15px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span onclick="closeMediaGallery()" style="cursor:pointer; font-size:20px;">←</span>
+                    <div style="font-weight:600; font-size:15px;">Shared Media Gallery</div>
+                </div>
+            </header>
+            <div id="mediaGalleryContainer" style="flex:1; overflow-y:auto; display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;"></div>
+        </div>
+
+        <div class="call-screen" id="callScreen">
+            <div style="font-size: 16px; color: #34d399; font-weight: bold; margin-top: 10px;" id="callTypeTitle">🔒 SECURE LIVE CALL</div>
+            
+            <div id="audioCallView" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:15px;">
+                <div class="avatar" id="callAvatarIcon" style="width:90px; height:90px; font-size:36px;">📞</div>
+                <div style="font-size:18px; font-weight:600;" id="callUserNameDisplay">Connecting...</div>
+            </div>
+
+            <div class="video-grid" id="videoGridContainer" style="display:none;">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <video id="localVideo" autoplay playsinline muted></video>
+            </div>
+
+            <div style="display:flex; gap:15px; margin-bottom:20px; align-items:center; justify-content:center;">
+                <button onclick="toggleMuteMic()" id="muteMicBtn" style="width: 45px; height: 45px; background: #334155; border-radius: 50%; border: none; color: white; font-size: 18px; cursor: pointer;" title="Mute Mic">🎤</button>
+                <button onclick="endCall()" style="width: 60px; height: 60px; background: #ef4444; border-radius: 50%; border: none; color: white; font-size: 22px; cursor: pointer;" title="End Call">📞</button>
+                <button onclick="toggleVideoCamera()" id="muteCamBtn" style="width: 45px; height: 45px; background: #334155; border-radius: 50%; border: none; color: white; font-size: 18px; cursor: pointer;" title="Camera Off">📹</button>
+            </div>
+        </div>
+
+        <div class="chat-screen" id="chatScreen">
+            <header>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span onclick="closeChat()" style="cursor:pointer; font-size:20px;">←</span>
+                    <div class="avatar" id="chatAvatar" style="width:34px; height:34px; font-size:13px; margin:0;">?</div>
+                    <div>
+                        <div id="chatName" style="font-weight:600; font-size:15px;" onclick="checkGroupSettings()">Chat</div>
+                        <div id="chatSubStatus" style="font-size:10px; color:#34d399;">Online 🟢</div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; font-size:15px; align-items:center;">
+                    <span onclick="toggleSearchBox()" style="cursor:pointer;" title="Search">🔍</span>
+                    <span onclick="openMediaGallery()" style="cursor:pointer;" title="Gallery">🖼️</span>
+                    <span onclick="startAudioCall()" style="cursor:pointer;" title="Audio">📞</span>
+                    <span onclick="startVideoCall()" style="cursor:pointer;" title="Video">📹</span>
+                    <span onclick="toggleBlockContact()" style="cursor:pointer;" title="Block/Unblock" id="blockIconBtn">🚫</span>
+                </div>
+            </header>
+            
+            <div class="pinned-banner" id="pinnedBanner">
+                <div>📌 <span id="pinnedText">No pinned message</span></div>
+                <span onclick="unpinMessage()" style="cursor:pointer; font-weight:bold;">✕</span>
+            </div>
+
+            <div class="search-bar-box" id="searchBarBox">
+                <input type="text" id="searchInput" placeholder="Chat mein message khojein..." oninput="searchMessages()">
+                <span onclick="toggleSearchBox()" style="cursor:pointer; font-size:14px; font-weight:bold;">✕</span>
+            </div>
+
+            <div class="messages" id="msgList">
+                <div style="text-align:center; font-size:11px; color:var(--sub); padding:4px;">🔒 Secure Encrypted Chat</div>
+            </div>
+
+            <input type="file" id="fileInput" style="display:none;" onchange="sendFile(event)">
+
+            <div class="attach-menu" id="attachMenu">
+                <div class="attach-item" onclick="document.getElementById('imgFile').click()">📷 Photo Bhejein</div>
+                <div class="attach-item" onclick="document.getElementById('fileInput').click()">📎 Document / File</div>
+                <div class="attach-item" onclick="toggleRecordVoice()">🎤 Asli Mic Voice Note</div>
+                <div class="attach-item" onclick="createPoll()">📊 Poll Banayein</div>
+                <div class="attach-item" onclick="setDisappearing()">⏳ Disappearing (15s)</div>
+            </div>
+
+            <div class="input-container">
+                <div class="reply-preview" id="replyPreview">
+                    <span id="replyPreviewText">Replying to...</span>
+                    <span onclick="cancelReply()" style="cursor:pointer; font-weight:bold;">✕</span>
+                </div>
+                <div class="input-bar">
+                    <input type="file" id="imgFile" accept="image/*" style="display:none;" onchange="sendImage(event)">
+                    <button class="icon-btn" onclick="toggleAttach()">📎</button>
+                    <input type="text" id="msgInput" placeholder="Message ya link likhein..." oninput="handleTyping()" onkeypress="if(event.key=='Enter')sendMsg()">
+                    <button class="icon-btn" onclick="insertEmoji('😊')">😊</button>
+                    <button class="send-btn" onclick="sendMsg()">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOVmmhxs2hEXNplaYlyXbL3_LrX6qxp6Q",
+            authDomain: "baatainapp.firebaseapp.com",
+            databaseURL: "https://baatainapp-default-rtdb.firebaseio.com/",
+            projectId: "baatainapp",
+            storageBucket: "baatainapp.firebasestorage.app",
+            messagingSenderId: "497675635158",
+            appId: "1:497675635158:web:8e2e729895097144017c77",
+            measurementId: "G-CWTRP946KP"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let myName = "";
+        let myBio = "Cloud User 🚀";
+        let hideOnlineStatus = false;
+        let contacts = [
+            {name: "Global Public Room", type: "group", admin: "System", members: ["System"]}
+        ];
+        let blockedUsers = [];
+        let starredMessages = [];
+        let activeChat = null, dbRef = null, typingRef = null, presenceRef = null, disappearActive = false;
+        let replyingTo = null;
+        let messageToForward = null;
+        let mediaRecorder, audioChunks = [];
+        let allMessagesCache = [];
+        let activeCallKey = null;
+
+        const SECRET_KEY = "BaatainSecureKey2026";
+        function encryptText(text) {
+            try { return btoa(encodeURIComponent(text).split('').map((char, index) => String.fromCharCode(char.charCodeAt(0) ^ SECRET_KEY.charCodeAt(index % SECRET_KEY.length))).join('')); } catch(e) { return text; }
+        }
+        function decryptText(encoded) {
+            try { return decodeURIComponent(atob(encoded).split('').map((char, index) => String.fromCharCode(char.charCodeAt(0) ^ SECRET_KEY.charCodeAt(index % SECRET_KEY.length))).join('')); } catch(e) { return encoded; }
+        }
+
+        let localStream, remoteStream, peerConnection;
+        const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
+
+        function startApp() {
+            let uName = document.getElementById('userNameInput').value.trim();
+            if(!uName) return alert("Kripya apna naam ya ID daalein!");
+            myName = uName;
+            document.getElementById('loginScreen').style.display = 'none';
+
+            db.ref("users/" + myName.replace(/[^a-zA-Z0-9]/g, '_')).set({
+                name: myName,
+                lastActive: Date.now()
+            });
+
+            db.ref("users").on('value', snap => {
+                let allUsers = snap.val() || {};
+                contacts = [{name: "Global Public Room", type: "group", admin: "System", members: ["System"]}];
+                for(let uKey in allUsers) {
+                    let uData = allUsers[uKey];
+                    if(uData.name && uData.name !== myName) {
+                        if(!contacts.some(c => c.name === uData.name)) {
+                            contacts.push({name: uData.name, type: 'direct'});
+                        }
+                    }
+                }
+                renderContacts(contacts);
+            });
+            
+            presenceRef = db.ref("presence/" + myName.replace(/[^a-zA-Z0-9]/g, '_'));
+            presenceRef.set({ status: "online", lastSeen: Date.now() });
+            presenceRef.onDisconnect().set({ status: "offline", lastSeen: Date.now() });
+
+            setupGlobalCallListener();
+        }
+
+        function setupGlobalCallListener() {
+            db.ref("calls").on('child_added', snap => {
+                let callKey = snap.key;
+                let data = snap.val();
+                if(data && data.offer && data.caller !== myName && !peerConnection) {
+                    if(callKey.includes(myName.replace(/[^a-zA-Z0-9]/g, '_')) || callKey === "Global_Public_Room") {
+                        if(confirm(data.caller + " se live " + (data.callType || 'video') + " call aa rahi hai? Accept karein?")) {
+                            activeCallKey = callKey;
+                            document.getElementById('callScreen').classList.add('active');
+                            
+                            if(data.callType === 'audio') {
+                                document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL";
+                                document.getElementById('audioCallView').style.display = 'flex';
+                                document.getElementById('videoGridContainer').style.display = 'none';
+                                document.getElementById('callUserNameDisplay').innerText = data.caller;
+                                document.getElementById('callAvatarIcon').innerText = data.caller[0];
+                            } else {
+                                document.getElementById('callTypeTitle').innerText = "📹 LIVE VIDEO CALL";
+                                document.getElementById('audioCallView').style.display = 'none';
+                                document.getElementById('videoGridContainer').style.display = 'flex';
+                            }
+
+                            let constraints = data.callType === 'audio' ? { video: false, audio: true } : { video: true, audio: true };
+                            
+                            navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+                                localStream = stream;
+                                if(data.callType === 'video') document.getElementById('localVideo').srcObject = localStream;
+
+                                peerConnection = new RTCPeerConnection(servers);
+                                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+                                peerConnection.ontrack = event => {
+                                    remoteStream = event.streams[0];
+                                    if(data.callType === 'video') document.getElementById('remoteVideo').srcObject = remoteStream;
+                                };
+
+                                let callRef = db.ref("calls/" + callKey);
+                                peerConnection.onicecandidate = event => {
+                                    if (event.candidate) callRef.child('candidates').push(event.candidate.toJSON());
+                                };
+
+                                peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer)).then(() => {
+                                    return peerConnection.createAnswer();
+                                }).then(answer => {
+                                    return peerConnection.setLocalDescription(answer).then(() => {
+                                        callRef.update({ answer: { type: answer.type, sdp: answer.sdp } });
+                                    });
+                                });
+
+                                callRef.child('candidates').on('child_added', cSnap => {
+                                    let candidate = new RTCIceCandidate(cSnap.val());
+                                    peerConnection.addIceCandidate(candidate);
+                                });
+                            }).catch(e => alert("Mic/Camera error: " + e));
+                        }
+                    }
+                }
+            });
+        }
+
+        function switchTab(i) {
+            document.querySelectorAll('.tab').forEach((t, idx) => t.classList.toggle('active', idx === i));
+            document.querySelectorAll('.content').forEach((c, idx) => c.classList.toggle('active', idx === i));
+            document.querySelector('.fab').style.display = (i === 0) ? 'flex' : 'none';
+        }
+
+        function renderContacts(listToRender) {
+            let list = document.getElementById('contactList'); list.innerHTML = '';
+            listToRender.forEach(c => {
+                let div = document.createElement('div'); div.className = 'item';
+                div.onclick = () => openChat(c.name);
+                let isBlocked = blockedUsers.includes(c.name);
+                let badge = isBlocked ? '🚫 Blocked' : (c.type === 'group' ? '👥 Group Chat' : '🟢 Online');
+                div.innerHTML = `<div class="avatar">${c.name[0]}<div class="online-dot"></div></div><div><b>${c.name}</b><div style="font-size:12px; color:var(--sub);" id="status_${c.name.replace(/[^a-zA-Z0-9]/g, '_')}">${badge}</div></div>`;
+                list.appendChild(div);
+            });
+        }
+
+        function filterContacts() {
+            let q = document.getElementById('contactSearchInput').value.toLowerCase();
+            let filtered = contacts.filter(c => c.name.toLowerCase().includes(q));
+            renderContacts(filtered);
+        }
+
+        function openModal() { document.getElementById('modal').classList.add('active'); }
+        function closeModal() { document.getElementById('modal').classList.remove('active'); }
+        function openAddContact() { closeModal(); document.getElementById('contactModal').classList.add('active'); }
+        function openCreateGroup() { closeModal(); document.getElementById('groupModal').classList.add('active'); }
+
+        function saveContact() {
+            let name = document.getElementById('contactNameInput').value.trim();
+            if(!name) return alert('Kripya naam daalein!');
+            if(!contacts.some(c => c.name === name)) contacts.push({name: name, type: 'direct'});
+            renderContacts(contacts);
+            document.getElementById('contactModal').classList.remove('active');
+            document.getElementById('contactNameInput').value = '';
+            openChat(name);
+        }
+
+        function saveGroup() {
+            let name = document.getElementById('groupNameInput').value.trim();
+            if(!name) return alert('Kripya group naam daalein!');
+            if(!contacts.some(c => c.name === name)) {
+                contacts.push({name: name, type: 'group', admin: myName, members: [myName]});
+            }
+            renderContacts(contacts);
+            document.getElementById('groupModal').classList.remove('active');
+            document.getElementById('groupNameInput').value = '';
+            openChat(name);
+        }
+
+        function openProfileModal() {
+            document.getElementById('profileNameEdit').value = myName;
+            document.getElementById('profileBioEdit').value = myBio;
+            document.getElementById('hideOnlineToggle').checked = hideOnlineStatus;
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        function saveProfile() {
+            let b = document.getElementById('profileBioEdit').value.trim();
+            hideOnlineStatus = document.getElementById('hideOnlineToggle').checked;
+            if(b) myBio = b;
+            document.getElementById('profileModal').classList.remove('active');
+            
+            if(hideOnlineStatus) {
+                presenceRef.set({ status: "hidden", lastSeen: Date.now() });
+            } else {
+                presenceRef.set({ status: "online", lastSeen: Date.now() });
+            }
+            alert("✨ Profile & Privacy updated!");
+        }
+
+        function openWallpaperModal() { document.getElementById('wallpaperModal').classList.add('active'); }
+        function setWallpaperColor(color) {
+            let screen = document.getElementById('chatScreen');
+            screen.style.backgroundImage = 'none';
+            screen.style.backgroundColor = color;
+            document.getElementById('wallpaperModal').classList.remove('active');
+        }
+
+        function setCustomWallpaperImage(e) {
+            let file = e.target.files[0];
+            if(!file) return;
+            let reader = new FileReader();
+            reader.onload = function(evt) {
+                let screen = document.getElementById('chatScreen');
+                screen.style.backgroundImage = `url('${evt.target.result}')`;
+                document.getElementById('wallpaperModal').classList.remove('active');
+                alert("✨ Gallery photo successfully set as chat background!");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openStarredModal() {
+            let container = document.getElementById('starredListContainer');
+            container.innerHTML = '';
+            if(starredMessages.length === 0) {
+                container.innerHTML = '<div style="color:var(--sub); text-align:center;">Koi starred message nahi hai.</div>';
+            } else {
+                starredMessages.forEach(m => {
+                    let d = document.createElement('div');
+                    d.style.cssText = "background:var(--bg); padding:8px; border-radius:6px; border-left:3px solid #10b981;";
+                    d.innerHTML = `<b>${m.sender}:</b> ${m.text}`;
+                    container.appendChild(d);
+                });
+            }
+            document.getElementById('starredModal').classList.add('active');
+        }
+
+        function openForwardModal(txt) {
+            messageToForward = txt;
+            let container = document.getElementById('forwardListContainer');
+            container.innerHTML = '';
+            contacts.forEach(c => {
+                let btn = document.createElement('button');
+                btn.style.cssText = "width:100%; padding:10px; background:var(--bg); border:1px solid #cbd5e1; border-radius:8px; cursor:pointer; text-align:left; font-weight:600; color:var(--text);";
+                btn.innerText = "➡️ " + c.name;
+                btn.onclick = () => forwardMessageToChat(c.name);
+                container.appendChild(btn);
+            });
+            document.getElementById('forwardModal').classList.add('active');
+        }
+
+        function forwardMessageToChat(targetChat) {
+            let cObj = contacts.find(c => c.name === targetChat);
+            let targetKey = "";
+            if(cObj && cObj.type === 'group') {
+                targetKey = "chat_" + targetChat.replace(/[^a-zA-Z0-9]/g, '_');
+            } else {
+                let sortedNames = [myName, targetChat].sort();
+                targetKey = "chat_" + sortedNames[0].replace(/[^a-zA-Z0-9]/g, '_') + "_" + sortedNames[1].replace(/[^a-zA-Z0-9]/g, '_');
+            }
+
+            db.ref(targetKey).push({
+                text: "📤 (Forwarded) " + messageToForward,
+                sender: myName,
+                isHtml: false,
+                seen: false,
+                seenBy: { [myName]: true },
+                deleted: false,
+                time: Date.now()
+            });
+            document.getElementById('forwardModal').classList.remove('active');
+            alert("✅ Message " + targetChat + " ko forward kar diya gaya hai!");
+        }
+
+        function toggleBlockContact() {
+            if(blockedUsers.includes(activeChat)) {
+                blockedUsers = blockedUsers.filter(u => u !== activeChat);
+                alert(activeChat + " ko unblock kar diya gaya hai.");
+            } else {
+                blockedUsers.push(activeChat);
+                alert(activeChat + " ko block kar diya gaya hai.");
+            }
+            renderContacts(contacts);
+        }
+
+        function checkGroupSettings() {
+            let grp = contacts.find(c => c.name === activeChat && c.type === 'group');
+            if(grp) {
+                let list = document.getElementById('groupMemberList');
+                list.innerHTML = '';
+                if(grp.members) {
+                    grp.members.forEach(m => {
+                        let row = document.createElement('div');
+                        row.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:var(--bg); padding:6px 10px; border-radius:6px;";
+                        row.innerHTML = `<span>👤 ${m}</span> ${grp.admin === myName && m !== myName ? `<span onclick="removeGroupMember('${activeChat}', '${m}')" style="color:#ef4444; cursor:pointer; font-weight:bold;">Remove</span>` : ''}`;
+                        list.appendChild(row);
+                    });
+                }
+                document.getElementById('groupAdminModal').classList.add('active');
+            }
+        }
+
+        function addGroupMember() {
+            let newMem = document.getElementById('newMemberInput').value.trim();
+            if(!newMem) return;
+            let grp = contacts.find(c => c.name === activeChat && c.type === 'group');
+            if(grp) {
+                if(!grp.members) grp.members = [myName];
+                if(!grp.members.includes(newMem)) {
+                    grp.members.push(newMem);
+                    alert(newMem + " ko group mein jodh diya gaya hai!");
+                    document.getElementById('newMemberInput').value = '';
+                    checkGroupSettings();
+                    renderContacts(contacts);
+                }
+            }
+        }
+
+        function removeGroupMember(gName, memberName) {
+            let grp = contacts.find(c => c.name === gName && c.type === 'group');
+            if(grp && grp.members) {
+                grp.members = grp.members.filter(m => m !== memberName);
+                alert(memberName + " ko group se hata diya gaya hai.");
+                checkGroupSettings();
+                renderContacts(contacts);
+            }
+        }
+
+        function openChat(name) {
+            activeChat = name; 
+            document.getElementById('chatName').innerText = name;
+            document.getElementById('chatAvatar').innerText = name[0];
+            document.getElementById('chatScreen').classList.add('open');
+            document.getElementById('msgList').innerHTML = `<div style="text-align:center; font-size:11px; color:var(--sub);">🔒 Secure Encrypted Chat</div>`;
+            allMessagesCache = [];
+            
+            let cObj = contacts.find(c => c.name === name);
+            let key = "";
+            if(cObj && cObj.type === 'group') {
+                key = "chat_" + name.replace(/[^a-zA-Z0-9]/g, '_');
+            } else {
+                let sortedNames = [myName, name].sort();
+                key = "chat_" + sortedNames[0].replace(/[^a-zA-Z0-9]/g, '_') + "_" + sortedNames[1].replace(/[^a-zA-Z0-9]/g, '_');
+            }
+
+            if(dbRef) dbRef.off();
+            dbRef = db.ref(key);
+
+            db.ref("pinned_" + key).on('value', snap => {
+                let pTxt = snap.val();
+                let banner = document.getElementById('pinnedBanner');
+                if(pTxt) {
+                    document.getElementById('pinnedText').innerText = pTxt;
+                    banner.classList.add('active');
+                } else {
+                    banner.classList.remove('active');
+                }
+            });
+
+            dbRef.on('child_added', snap => {
+                let d = snap.val();
+                if(d.deleted) {
+                    appendMsg(snap.key, "🚫 *Yeh message delete kar diya gaya hai*", d.sender === myName ? 'out' : 'in', false, {}, true, null, d.sender, true, d.seenBy || {});
+                    return;
+                }
+                let decryptedText = d.isHtml ? d.text : decryptText(d.text);
+                let msgObj = {key: snap.key, text: decryptedText, ...d};
+                allMessagesCache.push(msgObj);
+                appendMsg(snap.key, decryptedText, d.sender === myName ? 'out' : 'in', d.isHtml, d.reactions || {}, d.seen || false, d.replyTo || null, d.sender, false, d.seenBy || {});
+                
+                let seenByObj = d.seenBy || {};
+                if(!seenByObj[myName]) {
+                    seenByObj[myName] = true;
+                    dbRef.child(snap.key).update({ seen: true, seenBy: seenByObj });
+                }
+            });
+
+            dbRef.on('child_changed', snap => {
+                let d = snap.val();
+                if(d.deleted) {
+                    let elem = document.getElementById('bubble_box_' + snap.key);
+                    if(elem) elem.innerHTML = `<i style="color:var(--sub);">🚫 Message deleted</i>`;
+                }
+                if(d.seen) {
+                    let tickElem = document.getElementById('tick_' + snap.key);
+                    if(tickElem) tickElem.innerHTML = '✓✓ <span style="color:#38bdf8;">✓</span>';
+                }
+            });
+
+            typingRef = db.ref("typing_" + key);
+            typingRef.on('value', snap => {
+                let status = snap.val();
+                if(status && status !== myName) {
+                    document.getElementById('chatSubStatus').innerText = status + " typing...";
+                } else {
+                    document.getElementById('chatSubStatus').innerText = "Online 🟢";
+                }
+            });
+
+            if(cObj && cObj.type === 'direct') {
+                db.ref("presence/" + name.replace(/[^a-zA-Z0-9]/g, '_')).on('value', snap => {
+                    let pData = snap.val();
+                    if(pData) {
+                        if(pData.status === 'hidden' || pData.status === 'offline') {
+                            document.getElementById('chatSubStatus').innerText = "Offline / Last seen hidden";
+                        } else {
+                            document.getElementById('chatSubStatus').innerText = "Online 🟢";
+                        }
+                    }
+                });
+            } else if(cObj && cObj.type === 'group') {
+                document.getElementById('chatSubStatus').innerText = "Tap name for group info 👥";
+            }
+        }
+
+        function closeChat() { 
+            if(dbRef) dbRef.off(); 
+            if(typingRef) typingRef.set(false);
+            document.getElementById('chatScreen').classList.remove('open'); 
+        }
+
+        function toggleAttach() { document.getElementById('attachMenu').classList.toggle('active'); }
+        
+        function toggleSearchBox() {
+            let box = document.getElementById('searchBarBox');
+            box.classList.toggle('active');
+            if(box.classList.contains('active')) document.getElementById('searchInput').focus();
+        }
+
+        function searchMessages() {
+            let q = document.getElementById('searchInput').value.toLowerCase();
+            let list = document.getElementById('msgList');
+            list.innerHTML = '';
+            allMessagesCache.forEach(m => {
+                if(!m.deleted && m.text.toLowerCase().includes(q)) {
+                    appendMsg(m.key, m.text, m.sender === myName ? 'out' : 'in', m.isHtml, m.reactions || {}, m.seen || false, m.replyTo || null, m.sender, false, m.seenBy || {});
+                }
+            });
+        }
+
+        function openMediaGallery() {
+            let container = document.getElementById('mediaGalleryContainer');
+            container.innerHTML = '';
+            let hasMedia = false;
+            allMessagesCache.forEach(m => {
+                if(!m.deleted && m.isHtml && m.text.includes('<img')) {
+                    hasMedia = true;
+                    let div = document.createElement('div');
+                    div.innerHTML = m.text;
+                    container.appendChild(div);
+                }
+            });
+            if(!hasMedia) container.innerHTML = '<div style="grid-column: span 3; text-align:center; color:var(--sub); margin-top:40px;">Koi media nahi mili.</div>';
+            document.getElementById('mediaGalleryScreen').classList.add('active');
+        }
+
+        function closeMediaGallery() { document.getElementById('mediaGalleryScreen').classList.remove('active'); }
+
+        let typingTimeout;
+        function handleTyping() {
+            if(!typingRef) return;
+            typingRef.set(myName);
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => { typingRef.set(false); }, 1500);
+        }
+
+        function setReply(text) {
+            replyingTo = text;
+            document.getElementById('replyPreviewText').innerText = "Replying to: " + text;
+            document.getElementById('replyPreview').classList.add('active');
+            document.getElementById('msgInput').focus();
+        }
+
+        function cancelReply() {
+            replyingTo = null;
+            document.getElementById('replyPreview').classList.remove('active');
+        }
+
+        function formatMessageContent(txt) {
+            let ytMatch = txt.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+            if (ytMatch) {
+                let vidId = ytMatch[1];
+                return `${txt}<br><iframe width="100%" height="160" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen style="border-radius:8px; margin-top:6px;"></iframe>`;
+            }
+            return txt;
+        }
+
+        function sendMsg() {
+            if(blockedUsers.includes(activeChat)) {
+                alert("Aapne is user ko block kiya hua hai!");
+                return;
+            }
+            let inp = document.getElementById('msgInput'), txt = inp.value.trim();
+            if(!txt || !dbRef) return;
+            let formattedTxt = formatMessageContent(txt);
+            let isHtmlFormatted = formattedTxt !== txt;
+            let finalPayloadText = isHtmlFormatted ? formattedTxt : encryptText(txt);
+
+            dbRef.push({
+                text: finalPayloadText, 
+                sender: myName, 
+                isHtml: isHtmlFormatted, 
+                seen: false, 
+                seenBy: { [myName]: true },
+                deleted: false,
+                replyTo: replyingTo,
+                time: Date.now()
+            });
+            inp.value = ''; 
+            cancelReply();
+            if(typingRef) typingRef.set(false);
+            document.getElementById('attachMenu').classList.remove('active');
+        }
+
+        function sendImage(e) {
+            let file = e.target.files[0]; if(!file) return;
+            let reader = new FileReader();
+            reader.onload = function(evt) {
+                dbRef.push({text: `<img src="${evt.target.result}" onclick="openImgViewer(this.src)" style="width:100%; height:100px; object-fit:cover;">`, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, time: Date.now()});
+            };
+            reader.readAsDataURL(file); e.target.value = ''; document.getElementById('attachMenu').classList.remove('active');
+        }
+
+        function sendFile(e) {
+            let file = e.target.files[0]; if(!file) return;
+            let fileHtml = `📁 <b>Document:</b> ${file.name} (${(file.size/1024).toFixed(1)} KB)<br><a href="#" style="color:#10b981; font-size:12px;">Download File</a>`;
+            dbRef.push({text: fileHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, time: Date.now()});
+            e.target.value = ''; document.getElementById('attachMenu').classList.remove('active');
+        }
+
+        async function toggleRecordVoice() {
+            document.getElementById('attachMenu').classList.remove('active');
+            try {
+                let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                mediaRecorder.onstop = () => {
+                    let audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    let audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    let uniqueId = 'audio_' + Date.now();
+                    let voiceHtml = `🎵 <b>Voice Note</b>
+                    <audio id="${uniqueId}" src="${audioUrl}" style="display:none;"></audio>
+                    <div class="wave-bars">
+                        <div class="wave-bar" style="animation-delay: 0.1s;"></div>
+                        <div class="wave-bar" style="animation-delay: 0.3s;"></div>
+                        <div class="wave-bar" style="animation-delay: 0.2s;"></div>
+                        <div class="wave-bar" style="animation-delay: 0.4s;"></div>
+                        <div class="wave-bar" style="animation-delay: 0.1s;"></div>
+                        <div class="wave-bar" style="animation-delay: 0.5s;"></div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:2px;">
+                        <button onclick="playCustomAudio('${uniqueId}', this)" style="background:#10b981; color:white; border:none; border-radius:50%; width:26px; height:26px; cursor:pointer; font-size:11px;">▶</button>
+                        <input type="range" id="range_${uniqueId}" value="0" max="100" style="width:90px; cursor:pointer;" oninput="seekAudio('${uniqueId}', this)">
+                        <span id="time_${uniqueId}" style="font-size:10px; color:var(--sub);">0:00</span>
+                    </div>`;
+
+                    dbRef.push({text: voiceHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, time: Date.now()});
+                };
+                mediaRecorder.start();
+                alert("🎤 Recording shuru! 5 second mein stop hogi.");
+                setTimeout(() => { mediaRecorder.stop(); }, 5000);
+            } catch (err) { alert("Mic error: " + err); }
+        }
+
+        function playCustomAudio(audioId, btn) {
+            let aud = document.getElementById(audioId);
+            let range = document.getElementById('range_' + audioId);
+            let timeSpan = document.getElementById('time_' + audioId);
+
+            if(aud.paused) {
+                aud.play();
+                btn.innerText = "⏸";
+                aud.ontimeupdate = () => {
+                    let prog = (aud.currentTime / aud.duration) * 100;
+                    range.value = prog || 0;
+                    let mins = Math.floor(aud.currentTime / 60);
+                    let secs = Math.floor(aud.currentTime % 60);
+                    timeSpan.innerText = `${mins}:${secs < 10 ? '0':''}${secs}`;
+                };
+                aud.onended = () => { btn.innerText = "▶"; range.value = 0; };
+            } else {
+                aud.pause();
+                btn.innerText = "▶";
+            }
+        }
+
+        function seekAudio(audioId, rangeElem) {
+            let aud = document.getElementById(audioId);
+            if(aud.duration) {
+                aud.currentTime = (rangeElem.value / 100) * aud.duration;
+            }
+        }
+
+        function createPoll() {
+            let q = prompt("Poll ka sawal:", "Kahan milna hai?");
+            if(!q) return;
+            let pollHtml = `<div class="poll-box"><div style="font-weight:600;">📊 ${q}</div><div class="poll-option">1. Haan</div><div class="poll-option">2. Naa</div></div>`;
+            dbRef.push({text: pollHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, time: Date.now()});
+            document.getElementById('attachMenu').classList.remove('active');
+        }
+
+        function setDisappearing() {
+            disappearActive = !disappearActive;
+            alert(disappearActive ? "⏳ Disappearing Messages (15s) Enabled!" : "Disappearing Disabled");
+            document.getElementById('attachMenu').classList.remove('active');
+        }
+
+        function insertEmoji(em) { document.getElementById('msgInput').value += em; }
+        function openImgViewer(src) { document.getElementById('fullImg').src = src; document.getElementById('imgViewer').classList.add('active'); }
+        function addReaction(msgKey, emoji) {
+            let cObj = contacts.find(c => c.name === activeChat);
+            let key = "";
+            if(cObj && cObj.type === 'group') {
+                key = "chat_" + activeChat.replace(/[^a-zA-Z0-9]/g, '_');
+            } else {
+                let sortedNames = [myName, activeChat].sort();
+                key = "chat_" + sortedNames[0].replace(/[^a-zA-Z0-9]/g, '_') + "_" + sortedNames[1].replace(/[^a-zA-Z0-9]/g, '_');
+            }
+            db.ref(key + "/" + msgKey + "/reactions/" + emoji).transaction(val => (val || 0) + 1);
+        }
+
+        function deleteForEveryone(key, sender) {
+            if(sender !== myName) { alert("Aap sirf apna bheja hua message delete kar sakte hain!"); return; }
+            if(confirm("Kya aap yeh message sabke liye delete karna chahte hain?")) { dbRef.child(key).update({ deleted: true }); }
+        }
+
+        function pinMessage(txt) {
+            let cObj = contacts.find(c => c.name === activeChat);
+            let key = "";
+            if(cObj && cObj.type === 'group') {
+                key = "chat_" + activeChat.replace(/[^a-zA-Z0-9]/g, '_');
+            } else {
+                let sortedNames = [myName, activeChat].sort();
+                key = "chat_" + sortedNames[0].replace(/[^a-zA-Z0-9]/g, '_') + "_" + sortedNames[1].replace(/[^a-zA-Z0-9]/g, '_');
+            }
+            db.ref("pinned_" + key).set(txt);
+            alert("📌 Message pin kar diya gaya hai!");
+        }
+
+        function unpinMessage() {
+            let cObj = contacts.find(c => c.name === activeChat);
+            let key = "";
+            if(cObj && cObj.type === 'group') {
+                key = "chat_" + activeChat.replace(/[^a-zA-Z0-9]/g, '_');
+            } else {
+                let sortedNames = [myName, activeChat].sort();
+                key = "chat_" + sortedNames[0].replace(/[^a-zA-Z0-9]/g, '_') + "_" + sortedNames[1].replace(/[^a-zA-Z0-9]/g, '_');
+            }
+            db.ref("pinned_" + key).remove();
+        }
+
+        function starMessage(txt, sender) {
+            if(!starredMessages.some(m => m.text === txt)) {
+                starredMessages.push({text: txt, sender: sender});
+                alert("⭐ Message Starred messages mein jod diya gaya hai!");
+            } else {
+                alert("Yeh message pehle se starred hai.");
+            }
+        }
+
+        function showSeenByDetails(seenByObj) {
+            let names = Object.keys(seenByObj || {}).join(", ");
+            alert("👁️ Seen by: " + (names || "Nobody yet"));
+        }
+
+        function appendMsg(key, txt, cls, isHtml, reactions, seen, replyTo, sender, isDeleted, seenBy) {
+            let list = document.getElementById('msgList'), div = document.createElement('div');
+            div.className = `bubble ${cls}`;
+            
+            if(!isDeleted) {
+                div.onclick = () => setReply(isHtml ? "Media Message" : txt);
+            }
+
+            let box = document.createElement('div');
+            box.id = 'bubble_box_' + key;
+
+            if(sender && sender !== myName) {
+                let senderTag = document.createElement('div');
+                senderTag.style.cssText = "font-size:10px; font-weight:bold; color:#10b981; margin-bottom:2px;";
+                senderTag.innerText = sender;
+                box.appendChild(senderTag);
+            }
+
+            if(replyTo && !isDeleted) {
+                let quoteDiv = document.createElement('div');
+                quoteDiv.className = 'reply-quote';
+                quoteDiv.innerText = "↩ " + replyTo;
+                box.appendChild(quoteDiv);
+            }
+
+            let contentDiv = document.createElement('div');
+            if(isDeleted) {
+                contentDiv.innerHTML = `<i style="color:var(--sub);">🚫 Message deleted for everyone</i>`;
+            } else if(isHtml) {
+                contentDiv.innerHTML = txt; 
+            } else {
+                contentDiv.innerText = txt;
+            }
+            box.appendChild(contentDiv);
+
+            if(!isDeleted) {
+                let seenCount = Object.keys(seenBy || {}).length;
+                let tickSymbol = seenCount > 1 ? '✓✓ <span style="color:#38bdf8;">✓</span>' : '✓✓';
+                let timeDiv = document.createElement('div');
+                timeDiv.className = 'msg-time';
+                timeDiv.innerHTML = `<span onclick="showSeenByDetails(${JSON.stringify(seenBy || {}).replace(/"/g, '&quot;')})" style="cursor:pointer;" title="Seen list">👁️ ${seenCount}</span> <span id="tick_${key}">${tickSymbol}</span> <span onclick="event.stopPropagation(); pinMessage('${isHtml ? "Media" : txt}')" style="cursor:pointer; margin-left:3px;" title="Pin">📌</span> <span onclick="event.stopPropagation(); starMessage('${isHtml ? "Media" : txt}', '${sender}')" style="cursor:pointer; margin-left:3px;" title="Star">⭐</span> <span onclick="event.stopPropagation(); openForwardModal('${isHtml ? "Media Message" : txt}')" style="cursor:pointer; margin-left:3px;" title="Forward">➡️</span> <span onclick="event.stopPropagation(); deleteForEveryone('${key}', '${sender}')" style="cursor:pointer; margin-left:3px; color:#ef4444;" title="Delete">🗑️</span>`;
+                box.appendChild(timeDiv);
+
+                let reactBar = document.createElement('div');
+                reactBar.className = 'reactions-bar';
+                let reactHtml = `<span onclick="event.stopPropagation(); addReaction('${key}', '❤️')">❤️</span> <span onclick="event.stopPropagation(); addReaction('${key}', '👍')">👍</span> <span onclick="event.stopPropagation(); addReaction('${key}', '😂')">😂</span>`;
+                for(let em in reactions) {
+                    reactHtml += ` <span style="background:rgba(0,0,0,0.05); padding:1px 4px; border-radius:4px;">${em} ${reactions[em]}</span>`;
+                }
+                reactBar.innerHTML = reactHtml;
+                box.appendChild(reactBar);
+            }
+
+            div.appendChild(box);
+            if(disappearActive) { setTimeout(() => { div.remove(); }, 15000); }
+            list.appendChild(div); list.scrollTop = list.scrollHeight;
+        }
+
+        async function startVideoCall() { initiateCall('video'); }
+        async function startAudioCall() { initiateCall('audio'); }
+
+        async function initiateCall(type) {
+            document.getElementById('callScreen').classList.add('active');
+            
+            if(type === 'audio') {
+                document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL";
+                document.getElementById('audioCallView').style.display = 'flex';
+                document.getElementById('videoGridContainer').style.display = 'none';
+                document.getElementById('callUserNameDisplay').innerText = activeChat;
+                document.getElementById('callAvatarIcon').innerText = activeChat[0];
+            } else {
+                document.getElementById('callTypeTitle').innerText = "📹 LIVE VIDEO CALL";
+                document.getElementById('audioCallView').style.display = 'none';
+                document.getElementById('videoGridContainer').style.display = 'flex';
+            }
+
+            let constraints = type === 'video' ? { video: true, audio: true } : { video: false, audio: true };
+            
+            let cObj = contacts.find(c => c.name === activeChat);
+            let callKey = "";
+            if(cObj && cObj.type === 'group') {
+                callKey = activeChat.replace(/[^a-zA-Z0-9]/g, '_');
+            } else {
+                let sortedNames = [myName, activeChat].sort();
+                callKey = sortedNames[0].replace(/[^a-zA-Z0-9]/g, '_') + "_" + sortedNames[1].replace(/[^a-zA-Z0-9]/g, '_');
+            }
+            activeCallKey = callKey;
+
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                if(type === 'video') document.getElementById('localVideo').srcObject = localStream;
+
+                peerConnection = new RTCPeerConnection(servers);
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+                peerConnection.ontrack = event => {
+                    remoteStream = event.streams[0];
+                    if(type === 'video') document.getElementById('remoteVideo').srcObject = remoteStream;
+                };
+
+                let callRef = db.ref("calls/" + callKey);
+                peerConnection.onicecandidate = event => {
+                    if (event.candidate) callRef.child('candidates').push(event.candidate.toJSON());
+                };
+
+                let offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+                callRef.set({ offer: { type: offer.type, sdp: offer.sdp }, caller: myName, callType: type });
+
+                callRef.child('answer').on('value', async snap => {
+                    let ans = snap.val();
+                    if (ans && !peerConnection.currentRemoteDescription) {
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(ans));
+                    }
+                });
+
+                callRef.child('candidates').on('child_added', snap => {
+                    let candidate = new RTCIceCandidate(snap.val());
+                    peerConnection.addIceCandidate(candidate);
+                });
+
+            } catch (err) { alert("Call error: " + err); endCall(); }
+        }
+
+        function toggleMuteMic() {
+            if(localStream) {
+                let audioTrack = localStream.getAudioTracks()[0];
+                audioTrack.enabled = !audioTrack.enabled;
+                document.getElementById('muteMicBtn').style.background = audioTrack.enabled ? "#334155" : "#ef4444";
+            }
+        }
+
+        function toggleVideoCamera() {
+            if(localStream) {
+                let videoTrack = localStream.getVideoTracks()[0];
+                if(videoTrack) {
+                    videoTrack.enabled = !videoTrack.enabled;
+                    document.getElementById('muteCamBtn').style.background = videoTrack.enabled ? "#334155" : "#ef4444";
+                } else {
+                    alert("Yeh audio-only call hai!");
+                }
+            }
+        }
+
+        function endCall() {
+            if(localStream) localStream.getTracks().forEach(track => track.stop());
+            if(peerConnection) peerConnection.close();
+            peerConnection = null;
+            document.getElementById('callScreen').classList.remove('active');
+
+            if(activeCallKey) {
+                db.ref("calls/" + activeCallKey).remove();
+                activeCallKey = null;
+            } else if(activeChat) {
+                let cObj = contacts.find(c => c.name === activeChat);
+                let callKey = "";
+                if(cObj && cObj.type === 'group') {
+                    callKey = activeChat.replace(/[^a-zA-Z0-9]/g, '_');
+                } else {
+                    let sortedNames = [myName, activeChat].sort();
+                    callKey = sortedNames[0].replace(/[^a-zA-Z0-9]/g, '_') + "_" + sortedNames[1].replace(/[^a-zA-Z0-9]/g, '_');
+                }
+                db.ref("calls/" + callKey).remove();
+            }
+        }
+
+        function toggleDark() { document.body.classList.toggle('dark'); }
+        function addStatus() { let st = prompt("Apna Status likhein:"); if(st) document.getElementById('statusText').innerText = st; }
+    </script>
+</body>
+</html>
