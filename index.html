@@ -45,7 +45,10 @@
 
         .item { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; background: var(--card); width: 100%; justify-content: space-between; }
         .avatar { width: 45px; height: 45px; border-radius: 50%; background: #10b981; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 14px; flex-shrink: 0; position: relative; }
-        .online-dot { width: 12px; height: 12px; background: #10b981; border: 2px solid white; border-radius: 50%; position: absolute; bottom: 0; right: 0; }
+        
+        .online-dot { width: 12px; height: 12px; background: #94a3b8; border: 2px solid white; border-radius: 50%; position: absolute; bottom: 0; right: 0; transition: background 0.3s; }
+        .online-dot.active { background: #10b981; }
+
         .unread-badge { background: #10b981; color: white; font-size: 11px; padding: 2px 7px; border-radius: 10px; font-weight: bold; display: none; }
         .unread-badge.active { display: inline-block; }
 
@@ -143,7 +146,7 @@
         <header>
             <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-size:18px;">💬</span>
-                <div style="font-weight:700; font-size:16px; display:flex; align-items:center; gap:4px;">बातें <span style="background:#f59e0b; font-size:9px; padding:1px 5px; border-radius:6px; color:white;">MEGA PRO</span></div>
+                <div style="font-weight:700; font-size:16px; display:flex; align-items:center; gap:4px;">बातें <span style="background:#f59e0b; font-size:9px; padding:1px 5px; border-radius:6px; color:white;">LIVE</span></div>
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
                 <span onclick="openStarredModal()" style="cursor:pointer; font-size:16px;" title="Starred">⭐</span>
@@ -163,7 +166,7 @@
             <div class="contact-search-box">
                 <input type="text" id="contactSearchInput" placeholder="🔍 Dost khojein..." oninput="filterContacts()">
             </div>
-            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Masterpiece Edition: 35 Features Loaded</div>
+            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Live Online Status Sync Active</div>
             <div id="contactList" style="flex:1; overflow-y:auto; width:100%;"></div>
         </div>
 
@@ -175,8 +178,8 @@
         </div>
 
         <div class="content" id="sec2" style="padding: 20px; font-size: 13px; color: var(--text);">
-            <h3>Masterpiece Pro Features:</h3>
-            <p style="margin-top:6px;">Swipe-to-reply, Message Edit with (edited) tag, Audio scrubbing, Cloud image compression, Multi-forwarding, Push notifications, Offline queue & End-to-end security.</p>
+            <h3>Live Status Active:</h3>
+            <p style="margin-top:6px;">Contacts list now shows real-time online green dots and exact last seen status along with all 35 advanced features!</p>
         </div>
 
         <button class="fab" onclick="openModal()">+</button>
@@ -416,6 +419,7 @@
         let activeCallKey = null;
         let lastMessagesMap = {};
         let unreadCountsMap = {};
+        let onlinePresenceMap = {};
 
         const SECRET_KEY = "BaatainSecureKey2026";
         function encryptText(text) {
@@ -462,6 +466,16 @@
                 lastActive: Date.now()
             });
 
+            // Listen to live presence for all users
+            db.ref("presence").on('value', snap => {
+                let presData = snap.val() || {};
+                onlinePresenceMap = {};
+                for(let pKey in presData) {
+                    onlinePresenceMap[pKey] = presData[pKey];
+                }
+                renderContacts(contacts);
+            });
+
             db.ref("users").on('value', snap => {
                 let allUsers = snap.val() || {};
                 contacts = [{name: "Global Public Room", type: "group", admin: "System", members: ["System"]}];
@@ -485,6 +499,7 @@
         }
 
         function logoutApp() {
+            if(presenceRef) presenceRef.set({ status: "offline", lastSeen: Date.now() });
             localStorage.removeItem('baatain_username');
             location.reload();
         }
@@ -608,11 +623,27 @@
                 let div = document.createElement('div'); div.className = 'item';
                 div.onclick = () => openChat(c.name);
                 let isBlocked = blockedUsers.includes(c.name);
-                let lastMsg = lastMessagesMap[c.name] || (c.type === 'group' ? '👥 Group Chat' : '🟢 Online');
+                
+                let pKey = c.name.replace(/[^a-zA-Z0-9]/g, '_');
+                let pData = onlinePresenceMap[pKey];
+                let isOnline = false;
+                let statusTextCustom = c.type === 'group' ? '👥 Group Chat' : 'Offline ⚪';
+
+                if(c.type === 'group') {
+                    statusTextCustom = '👥 Group Chat';
+                } else if(pData && pData.status === 'online' && (Date.now() - pData.lastSeen < 30000)) {
+                    isOnline = true;
+                    statusTextCustom = 'Online 🟢';
+                } else if(pData && pData.lastSeen) {
+                    let d = new Date(pData.lastSeen);
+                    statusTextCustom = 'Last seen ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
+
+                let lastMsg = lastMessagesMap[c.name] || statusTextCustom;
                 let badge = isBlocked ? '🚫 Blocked' : lastMsg;
                 let unreadCount = unreadCountsMap[c.name] || 0;
                 
-                div.innerHTML = `<div style="display:flex; align-items:center; overflow:hidden;"><div class="avatar">${c.name[0]}<div class="online-dot"></div></div><div style="overflow:hidden;"><b>${c.name}</b><div style="font-size:12px; color:var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${badge}</div></div></div><div class="unread-badge ${unreadCount > 0 ? 'active':''}">${unreadCount}</div>`;
+                div.innerHTML = `<div style="display:flex; align-items:center; overflow:hidden;"><div class="avatar">${c.name[0]}<div class="online-dot ${isOnline ? 'active':''}"></div></div><div style="overflow:hidden;"><b>${c.name}</b><div style="font-size:12px; color:var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${badge}</div></div></div><div class="unread-badge ${unreadCount > 0 ? 'active':''}">${unreadCount}</div>`;
                 list.appendChild(div);
             });
         }
@@ -884,16 +915,17 @@
                 } else {
                     typingBubble.classList.remove('active');
                     if(cObj && cObj.type === 'direct') {
-                        db.ref("presence/" + name.replace(/[^a-zA-Z0-9]/g, '_')).once('value', pSnap => {
-                            let pData = pSnap.val();
-                            if(pData && (pData.status === 'hidden' || pData.status === 'offline')) {
-                                let lastSeenDate = new Date(pData.lastSeen || Date.now());
-                                let timeStr = lastSeenDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                                document.getElementById('chatSubStatus').innerText = "Last seen at " + timeStr;
-                            } else {
-                                document.getElementById('chatSubStatus').innerText = "Online 🟢";
-                            }
-                        });
+                        let pKeyChat = name.replace(/[^a-zA-Z0-9]/g, '_');
+                        let pDataChat = onlinePresenceMap[pKeyChat];
+                        if(pDataChat && pDataChat.status === 'online' && (Date.now() - pDataChat.lastSeen < 30000)) {
+                            document.getElementById('chatSubStatus').innerText = "Online 🟢";
+                        } else if(pDataChat && pDataChat.lastSeen) {
+                            let lastSeenDate = new Date(pDataChat.lastSeen);
+                            let timeStr = lastSeenDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            document.getElementById('chatSubStatus').innerText = "Last seen at " + timeStr;
+                        } else {
+                            document.getElementById('chatSubStatus').innerText = "Offline ⚪";
+                        }
                     } else {
                         document.getElementById('chatSubStatus').innerText = "Tap name for group info 👥";
                     }
@@ -901,18 +933,15 @@
             });
 
             if(cObj && cObj.type === 'direct') {
-                db.ref("presence/" + name.replace(/[^a-zA-Z0-9]/g, '_')).on('value', snap => {
-                    let pData = snap.val();
-                    if(pData) {
-                        if(pData.status === 'hidden' || pData.status === 'offline') {
-                            let lastSeenDate = new Date(pData.lastSeen || Date.now());
-                            let timeStr = lastSeenDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                            document.getElementById('chatSubStatus').innerText = "Last seen at " + timeStr;
-                        } else {
-                            document.getElementById('chatSubStatus').innerText = "Online 🟢";
-                        }
-                    }
-                });
+                let pKeyChat = name.replace(/[^a-zA-Z0-9]/g, '_');
+                let pDataChat = onlinePresenceMap[pKeyChat];
+                if(pDataChat && pDataChat.status === 'online' && (Date.now() - pDataChat.lastSeen < 30000)) {
+                    document.getElementById('chatSubStatus').innerText = "Online 🟢";
+                } else if(pDataChat && pDataChat.lastSeen) {
+                    let lastSeenDate = new Date(pDataChat.lastSeen);
+                    let timeStr = lastSeenDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    document.getElementById('chatSubStatus').innerText = "Last seen at " + timeStr;
+                }
             }
         }
 
@@ -971,6 +1000,7 @@
             typingRef.set(myName);
             clearTimeout(typingTimeout);
             typingTimeout = setTimeout(() => { typingRef.set(false); }, 1500);
+            if(presenceRef) presenceRef.update({ lastSeen: Date.now(), status: "online" });
         }
 
         function setReply(text) {
@@ -1232,7 +1262,6 @@
             let list = document.getElementById('msgList'), div = document.createElement('div');
             div.className = `bubble ${cls}`;
             
-            // Swipe-to-reply touch handlers
             let touchStartX = 0;
             div.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
             div.addEventListener('touchend', e => {
