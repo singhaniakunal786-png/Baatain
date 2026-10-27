@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>बातें (Baatain) - Ultimate Pro Max Plus</title>
+    <title>बातें (Baatain) - Flawless Pro Messenger</title>
     <meta name="theme-color" content="#0f172a">
     
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Baatain%20Messenger%22%2C%22short_name%22%3A%22Baatain%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
@@ -64,13 +64,15 @@
         .search-bar-box.active { display: flex; }
         .search-bar-box input { flex: 1; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; background: var(--bg); color: var(--text); }
 
-        .messages { flex: 1; width: 100%; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 85px; }
+        .messages { flex: 1; width: 100%; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 85px; scroll-behavior: smooth; }
         
         .bubble { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 14px; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); position: relative; cursor: pointer; }
         .in { background: var(--bubble-in); color: var(--text); align-self: flex-start; }
         .out { background: var(--bubble-out); color: var(--text); align-self: flex-end; }
         .bubble img { max-width: 100%; border-radius: 8px; margin-top: 4px; }
         .msg-time { font-size: 9px; color: var(--sub); text-align: right; margin-top: 3px; display: flex; justify-content: flex-end; gap: 2px; align-items: center; }
+
+        .date-divider { text-align: center; font-size: 10px; background: rgba(0,0,0,0.1); color: var(--sub); padding: 2px 8px; border-radius: 10px; align-self: center; margin: 6px 0; }
 
         .wave-bars { display: flex; align-items: center; gap: 2px; height: 16px; margin: 4px 0; }
         .wave-bar { width: 3px; background: #10b981; border-radius: 2px; animation: pulseWave 1.2s infinite ease-in-out; }
@@ -163,7 +165,7 @@
             <div class="contact-search-box">
                 <input type="text" id="contactSearchInput" placeholder="🔍 Dost khojein..." oninput="filterContacts()">
             </div>
-            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Speed Controls & Gradients Active</div>
+            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Flawless Mode & Offline Sync Active</div>
             <div id="contactList" style="flex:1; overflow-y:auto; width:100%;"></div>
         </div>
 
@@ -175,8 +177,8 @@
         </div>
 
         <div class="content" id="sec2" style="padding: 20px; font-size: 13px; color: var(--text);">
-            <h3>Pro Features (Fully Upgraded):</h3>
-            <p style="margin-top:6px;">Audio speed control (1x, 1.5x, 2x), Custom emoji drawer, Gradient wallpapers, Auto-reconnect indicators, Message search highlighting, Sound effects toggle & more!</p>
+            <h3>Pro Features & Bug Fixes:</h3>
+            <p style="margin-top:6px;">Auto-reconnect fallback, WhatsApp style ticks (✓/✓✓/Blue), In-app notification sound alerts, Image auto-compression, Smooth auto-scrolling, Logout session support & instant sync.</p>
         </div>
 
         <button class="fab" onclick="openModal()">+</button>
@@ -214,7 +216,7 @@
 
         <div class="modal" id="profileModal">
             <div class="modal-box">
-                <h3>User Profile & Privacy</h3>
+                <h3>User Profile & Session</h3>
                 <label style="font-size:11px; color:var(--sub);">Naam / ID:</label>
                 <input type="text" id="profileNameEdit" disabled>
                 <label style="font-size:11px; color:var(--sub);">Bio / Status:</label>
@@ -223,6 +225,7 @@
                     <input type="checkbox" id="hideOnlineToggle" style="width:16px; height:16px;">
                     <label for="hideOnlineToggle">Hide Online Status</label>
                 </div>
+                <button onclick="logoutApp()" style="width:100%; padding:8px; margin-top:6px; background:#ef4444; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:600;">🚪 Logout / Switch Account</button>
                 <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
                     <button onclick="document.getElementById('profileModal').classList.remove('active')" style="padding:8px 14px; background:#cbd5e1; border:none; border-radius:6px; cursor:pointer;">Radd</button>
                     <button onclick="saveProfile()" style="padding:8px 14px; background:#10b981; color:white; border:none; border-radius:6px; cursor:pointer;">Save</button>
@@ -297,6 +300,7 @@
 
             <audio id="remoteAudioElement" autoplay></audio>
             <audio id="ringtoneAudioElement" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" loop></audio>
+            <audio id="msgNotificationSound" src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3"></audio>
 
             <div style="display:flex; gap:12px; margin-bottom:20px; align-items:center; justify-content:center;">
                 <button onclick="toggleMuteMic()" id="muteMicBtn" style="width: 45px; height: 45px; background: #334155; border-radius: 50%; border: none; color: white; font-size: 18px; cursor: pointer;" title="Mute Mic">🎤</button>
@@ -398,7 +402,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let myName = "";
+        let myName = localStorage.getItem('baatain_username') || "";
         let myBio = localStorage.getItem('baatain_bio') || "Cloud User 🚀";
         let hideOnlineStatus = false;
         let contacts = [
@@ -438,6 +442,10 @@
                 } else {
                     screen.style.backgroundImage = `url('${savedWallpaper}')`;
                 }
+                if(myName) {
+                    document.getElementById('userNameInput').value = myName;
+                    startApp();
+                }
             });
         }
 
@@ -448,6 +456,7 @@
             let uName = document.getElementById('userNameInput').value.trim();
             if(!uName) return alert("Kripya apna naam ya ID daalein!");
             myName = uName;
+            localStorage.setItem('baatain_username', myName);
             document.getElementById('loginScreen').style.display = 'none';
 
             db.ref("users/" + myName.replace(/[^a-zA-Z0-9]/g, '_')).set({
@@ -475,6 +484,11 @@
             presenceRef.onDisconnect().set({ status: "offline", lastSeen: Date.now() });
 
             setupGlobalCallListener();
+        }
+
+        function logoutApp() {
+            localStorage.removeItem('baatain_username');
+            location.reload();
         }
 
         function fetchChatMetadata() {
@@ -663,31 +677,6 @@
         }
 
         function openWallpaperModal() { document.getElementById('wallpaperModal').classList.add('active'); }
-        function setWallpaperColor(val) {
-            let screen = document.getElementById('chatScreen');
-            if(val.includes('gradient')) {
-                screen.style.backgroundImage = val;
-            } else {
-                screen.style.backgroundImage = 'none';
-                screen.style.backgroundColor = val;
-            }
-            localStorage.setItem('baatain_wallpaper', val);
-            document.getElementById('wallpaperModal').classList.remove('active');
-        }
-
-        function setCustomWallpaperImage(e) {
-            let file = e.target.files[0];
-            if(!file) return;
-            let reader = new FileReader();
-            reader.onload = function(evt) {
-                let screen = document.getElementById('chatScreen');
-                screen.style.backgroundImage = `url('${evt.target.result}')`;
-                localStorage.setItem('baatain_wallpaper', evt.target.result);
-                document.getElementById('wallpaperModal').classList.remove('active');
-                alert("✨ Gallery photo successfully saved as permanent wallpaper!");
-            };
-            reader.readAsDataURL(file);
-        }
 
         function openStarredModal() {
             let container = document.getElementById('starredListContainer');
@@ -841,6 +830,10 @@
 
             dbRef.on('child_added', snap => {
                 let d = snap.val();
+                if(d.sender && d.sender !== myName) {
+                    let notifSound = document.getElementById('msgNotificationSound');
+                    if(notifSound) notifSound.play().catch(e => {});
+                }
                 if(d.deleted) {
                     appendMsg(snap.key, "🚫 *Yeh message delete kar diya gaya hai*", d.sender === myName ? 'out' : 'in', false, {}, true, null, d.sender, true, d.seenBy || {}, d.time);
                     return;
@@ -865,7 +858,14 @@
                 }
                 if(d.seen) {
                     let tickElem = document.getElementById('tick_' + snap.key);
-                    if(tickElem) tickElem.innerHTML = '✓✓ <span style="color:#38bdf8;">✓</span>';
+                    let seenCount = Object.keys(d.seenBy || {}).length;
+                    if(tickElem) {
+                        if(seenCount > 1) {
+                            tickElem.innerHTML = '✓✓ <span style="color:#38bdf8;">✓</span>';
+                        } else {
+                            tickElem.innerHTML = '✓✓';
+                        }
+                    }
                 }
             });
 
@@ -1021,9 +1021,29 @@
             let file = e.target.files[0]; if(!file) return;
             let reader = new FileReader();
             reader.onload = function(evt) {
-                dbRef.push({text: `<img src="${evt.target.result}" onclick="openImgViewer(this.src)" style="width:100%; height:100px; object-fit:cover;">`, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, time: Date.now()});
+                let img = new Image();
+                img.onload = function() {
+                    let canvas = document.createElement('canvas');
+                    let ctx = canvas.getContext('2d');
+                    let MAX_WIDTH = 800;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+                    dbRef.push({text: `<img src="${compressedDataUrl}" onclick="openImgViewer(this.src)" style="width:100%; height:120px; object-fit:cover;">`, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, time: Date.now()});
+                }
+                img.src = evt.target.result;
             };
-            reader.readAsDataURL(file); e.target.value = ''; document.getElementById('attachMenu').classList.remove('active');
+            reader.readAsDataURL(file); 
+            e.target.value = ''; 
+            document.getElementById('attachMenu').classList.remove('active');
         }
 
         function sendFile(e) {
@@ -1240,7 +1260,13 @@
 
             if(!isDeleted) {
                 let seenCount = Object.keys(seenBy || {}).length;
-                let tickSymbol = seenCount > 1 ? '✓✓ <span style="color:#38bdf8;">✓</span>' : '✓✓';
+                let tickSymbol = '✓✓';
+                if(seenCount > 1) {
+                    tickSymbol = '✓✓ <span style="color:#38bdf8;">✓</span>';
+                } else {
+                    tickSymbol = '✓✓';
+                }
+
                 let dateObj = new Date(msgTime || Date.now());
                 let timeString = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
