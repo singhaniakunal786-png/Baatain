@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>बातें (Baatain) - Flawless Pro Messenger</title>
+    <title>बातें (Baatain) - Ultimate Global Messenger Pro</title>
     <meta name="theme-color" content="#0f172a">
     
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Baatain%20Messenger%22%2C%22short_name%22%3A%22Baatain%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
@@ -66,13 +66,11 @@
 
         .messages { flex: 1; width: 100%; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 85px; scroll-behavior: smooth; }
         
-        .bubble { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 14px; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); position: relative; cursor: pointer; }
+        .bubble { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 14px; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); position: relative; cursor: pointer; user-select: none; }
         .in { background: var(--bubble-in); color: var(--text); align-self: flex-start; }
         .out { background: var(--bubble-out); color: var(--text); align-self: flex-end; }
         .bubble img { max-width: 100%; border-radius: 8px; margin-top: 4px; }
         .msg-time { font-size: 9px; color: var(--sub); text-align: right; margin-top: 3px; display: flex; justify-content: flex-end; gap: 2px; align-items: center; }
-
-        .date-divider { text-align: center; font-size: 10px; background: rgba(0,0,0,0.1); color: var(--sub); padding: 2px 8px; border-radius: 10px; align-self: center; margin: 6px 0; }
 
         .wave-bars { display: flex; align-items: center; gap: 2px; height: 16px; margin: 4px 0; }
         .wave-bar { width: 3px; background: #10b981; border-radius: 2px; animation: pulseWave 1.2s infinite ease-in-out; }
@@ -145,7 +143,7 @@
         <header>
             <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-size:18px;">💬</span>
-                <div style="font-weight:700; font-size:16px; display:flex; align-items:center; gap:4px;">बातें <span style="background:#f59e0b; font-size:9px; padding:1px 5px; border-radius:6px; color:white;">PRO</span></div>
+                <div style="font-weight:700; font-size:16px; display:flex; align-items:center; gap:4px;">बातें <span style="background:#f59e0b; font-size:9px; padding:1px 5px; border-radius:6px; color:white;">MEGA PRO</span></div>
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
                 <span onclick="openStarredModal()" style="cursor:pointer; font-size:16px;" title="Starred">⭐</span>
@@ -165,7 +163,7 @@
             <div class="contact-search-box">
                 <input type="text" id="contactSearchInput" placeholder="🔍 Dost khojein..." oninput="filterContacts()">
             </div>
-            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Flawless Mode & Offline Sync Active</div>
+            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Masterpiece Edition: 35 Features Loaded</div>
             <div id="contactList" style="flex:1; overflow-y:auto; width:100%;"></div>
         </div>
 
@@ -177,8 +175,8 @@
         </div>
 
         <div class="content" id="sec2" style="padding: 20px; font-size: 13px; color: var(--text);">
-            <h3>Pro Features & Bug Fixes:</h3>
-            <p style="margin-top:6px;">Auto-reconnect fallback, WhatsApp style ticks (✓/✓✓/Blue), In-app notification sound alerts, Image auto-compression, Smooth auto-scrolling, Logout session support & instant sync.</p>
+            <h3>Masterpiece Pro Features:</h3>
+            <p style="margin-top:6px;">Swipe-to-reply, Message Edit with (edited) tag, Audio scrubbing, Cloud image compression, Multi-forwarding, Push notifications, Offline queue & End-to-end security.</p>
         </div>
 
         <button class="fab" onclick="openModal()">+</button>
@@ -341,7 +339,7 @@
             </div>
 
             <div class="messages" id="msgList">
-                <div style="text-align:center; font-size:11px; color:var(--sub); padding:4px;">🔒 Secure Encrypted Chat</div>
+                <div style="text-align:center; font-size:11px; color:var(--sub); padding:4px;">🔒 Secure Encrypted Chat (Swipe right on bubble to reply)</div>
                 <div class="typing-bubble" id="typingIndicatorBubble">
                     <div class="dot"></div>
                     <div class="dot"></div>
@@ -835,13 +833,13 @@
                     if(notifSound) notifSound.play().catch(e => {});
                 }
                 if(d.deleted) {
-                    appendMsg(snap.key, "🚫 *Yeh message delete kar diya gaya hai*", d.sender === myName ? 'out' : 'in', false, {}, true, null, d.sender, true, d.seenBy || {}, d.time);
+                    appendMsg(snap.key, "🚫 *Yeh message delete kar diya gaya hai*", d.sender === myName ? 'out' : 'in', false, {}, true, null, d.sender, true, d.seenBy || {}, d.time, d.edited);
                     return;
                 }
                 let decryptedText = d.isHtml ? d.text : decryptText(d.text);
                 let msgObj = {key: snap.key, text: decryptedText, ...d};
                 allMessagesCache.push(msgObj);
-                appendMsg(snap.key, decryptedText, d.sender === myName ? 'out' : 'in', d.isHtml, d.reactions || {}, d.seen || false, d.replyTo || null, d.sender, false, d.seenBy || {}, d.time);
+                appendMsg(snap.key, decryptedText, d.sender === myName ? 'out' : 'in', d.isHtml, d.reactions || {}, d.seen || false, d.replyTo || null, d.sender, false, d.seenBy || {}, d.time, d.edited);
                 
                 let seenByObj = d.seenBy || {};
                 if(!seenByObj[myName]) {
@@ -855,6 +853,13 @@
                 if(d.deleted) {
                     let elem = document.getElementById('bubble_box_' + snap.key);
                     if(elem) elem.innerHTML = `<i style="color:var(--sub);">🚫 Message deleted</i>`;
+                }
+                if(d.edited) {
+                    let elem = document.getElementById('content_' + snap.key);
+                    if(elem) {
+                        let updatedText = d.isHtml ? d.text : decryptText(d.text);
+                        elem.innerHTML = updatedText + ` <span style="font-size:9px; color:var(--sub); font-style:italic;">(edited)</span>`;
+                    }
                 }
                 if(d.seen) {
                     let tickElem = document.getElementById('tick_' + snap.key);
@@ -937,7 +942,7 @@
             list.innerHTML = '';
             allMessagesCache.forEach(m => {
                 if(!m.deleted && m.text.toLowerCase().includes(q)) {
-                    appendMsg(m.key, m.text, m.sender === myName ? 'out' : 'in', m.isHtml, m.reactions || {}, m.seen || false, m.replyTo || null, m.sender, false, m.seenBy || {}, m.time);
+                    appendMsg(m.key, m.text, m.sender === myName ? 'out' : 'in', m.isHtml, m.reactions || {}, m.seen || false, m.replyTo || null, m.sender, false, m.seenBy || {}, m.time, m.edited);
                 }
             });
         }
@@ -1007,6 +1012,7 @@
                 seen: false, 
                 seenBy: { [myName]: true },
                 deleted: false,
+                edited: false,
                 replyTo: replyingTo,
                 time: Date.now()
             });
@@ -1015,6 +1021,14 @@
             if(typingRef) typingRef.set(false);
             document.getElementById('attachMenu').classList.remove('active');
             document.getElementById('emojiPickerPopup').classList.remove('active');
+        }
+
+        function editMessage(key, oldText, sender) {
+            if(sender !== myName) { alert("Aap sirf apna message edit kar sakte hain!"); return; }
+            let newTxt = prompt("Message edit karein:", oldText);
+            if(!newTxt || newTxt.trim() === "") return;
+            let finalEncrypted = encryptText(newTxt.trim());
+            dbRef.child(key).update({ text: finalEncrypted, edited: true });
         }
 
         function sendImage(e) {
@@ -1037,7 +1051,7 @@
                     ctx.drawImage(img, 0, 0, width, height);
                     let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
 
-                    dbRef.push({text: `<img src="${compressedDataUrl}" onclick="openImgViewer(this.src)" style="width:100%; height:120px; object-fit:cover;">`, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, time: Date.now()});
+                    dbRef.push({text: `<img src="${compressedDataUrl}" onclick="openImgViewer(this.src)" style="width:100%; height:120px; object-fit:cover;">`, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, edited: false, time: Date.now()});
                 }
                 img.src = evt.target.result;
             };
@@ -1049,7 +1063,7 @@
         function sendFile(e) {
             let file = e.target.files[0]; if(!file) return;
             let fileHtml = `📁 <b>Document:</b> ${file.name} (${(file.size/1024).toFixed(1)} KB)<br><a href="#" style="color:#10b981; font-size:12px;">Download File</a>`;
-            dbRef.push({text: fileHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, time: Date.now()});
+            dbRef.push({text: fileHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, edited: false, time: Date.now()});
             e.target.value = ''; document.getElementById('attachMenu').classList.remove('active');
         }
 
@@ -1082,7 +1096,7 @@
                         <span id="time_${uniqueId}" style="font-size:9px; color:var(--sub);">0:00</span>
                     </div>`;
 
-                    dbRef.push({text: voiceHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, time: Date.now()});
+                    dbRef.push({text: voiceHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, edited: false, time: Date.now()});
                 };
                 mediaRecorder.start();
                 alert("🎤 Recording shuru! 5 second mein stop hogi.");
@@ -1137,7 +1151,7 @@
             let q = prompt("Poll ka sawal:", "Kahan milna hai?");
             if(!q) return;
             let pollHtml = `<div class="poll-box"><div style="font-weight:600;">📊 ${q}</div><div class="poll-option">1. Haan</div><div class="poll-option">2. Naa</div></div>`;
-            dbRef.push({text: pollHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, time: Date.now()});
+            dbRef.push({text: pollHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, edited: false, time: Date.now()});
             document.getElementById('attachMenu').classList.remove('active');
         }
 
@@ -1214,10 +1228,20 @@
             alert("👁️ Seen by: " + (names || "Nobody yet"));
         }
 
-        function appendMsg(key, txt, cls, isHtml, reactions, seen, replyTo, sender, isDeleted, seenBy, msgTime) {
+        function appendMsg(key, txt, cls, isHtml, reactions, seen, replyTo, sender, isDeleted, seenBy, msgTime, isEdited) {
             let list = document.getElementById('msgList'), div = document.createElement('div');
             div.className = `bubble ${cls}`;
             
+            // Swipe-to-reply touch handlers
+            let touchStartX = 0;
+            div.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+            div.addEventListener('touchend', e => {
+                let touchEndX = e.changedTouches[0].screenX;
+                if (touchEndX - touchStartX > 50 && !isDeleted) {
+                    setReply(isHtml ? "Media Message" : txt);
+                }
+            });
+
             if(!isDeleted) {
                 div.onclick = () => setReply(isHtml ? "Media Message" : txt);
             }
@@ -1240,6 +1264,7 @@
             }
 
             let contentDiv = document.createElement('div');
+            contentDiv.id = 'content_' + key;
             let searchQuery = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : '';
             
             if(isDeleted) {
@@ -1251,29 +1276,26 @@
                 if(searchQuery && displayedText.toLowerCase().includes(searchQuery)) {
                     let regex = new RegExp(`(${searchQuery})`, 'gi');
                     displayedText = displayedText.replace(regex, `<span style="background:#f59e0b; color:black; padding:0 2px; border-radius:2px;">$1</span>`);
-                    contentDiv.innerHTML = displayedText;
+                    contentDiv.innerHTML = displayedText + (isEdited ? ` <span style="font-size:9px; color:var(--sub); font-style:italic;">(edited)</span>` : '');
                 } else {
-                    contentDiv.innerText = txt;
+                    contentDiv.innerText = txt + (isEdited ? " (edited)" : "");
                 }
             }
             box.appendChild(contentDiv);
 
             if(!isDeleted) {
                 let seenCount = Object.keys(seenBy || {}).length;
-                let tickSymbol = '✓✓';
-                if(seenCount > 1) {
-                    tickSymbol = '✓✓ <span style="color:#38bdf8;">✓</span>';
-                } else {
-                    tickSymbol = '✓✓';
-                }
-
+                let tickSymbol = seenCount > 1 ? '✓✓ <span style="color:#38bdf8;">✓</span>' : '✓✓';
                 let dateObj = new Date(msgTime || Date.now());
                 let timeString = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                 let rawCleanText = isHtml ? "Media" : txt;
                 let timeDiv = document.createElement('div');
                 timeDiv.className = 'msg-time';
-                timeDiv.innerHTML = `<span>${timeString}</span> <span onclick="showSeenByDetails(${JSON.stringify(seenBy || {}).replace(/"/g, '&quot;')})" style="cursor:pointer;" title="Seen list">👁️ ${seenCount}</span> <span id="tick_${key}">${tickSymbol}</span> <span onclick="event.stopPropagation(); copyMessageText('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Copy">📋</span> <span onclick="event.stopPropagation(); pinMessage('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Pin">📌</span> <span onclick="event.stopPropagation(); starMessage('${rawCleanText}', '${sender}')" style="cursor:pointer; margin-left:3px;" title="Star">⭐</span> <span onclick="event.stopPropagation(); openForwardModal('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Forward">➡️</span> <span onclick="event.stopPropagation(); deleteForEveryone('${key}', '${sender}')" style="cursor:pointer; margin-left:3px; color:#ef4444;" title="Delete">🗑️</span>`;
+                
+                let editBtnHtml = (sender === myName && !isHtml) ? `<span onclick="event.stopPropagation(); editMessage('${key}', '${rawCleanText}', '${sender}')" style="cursor:pointer; margin-left:3px;" title="Edit">✏️</span>` : '';
+
+                timeDiv.innerHTML = `<span>${timeString}</span> <span onclick="showSeenByDetails(${JSON.stringify(seenBy || {}).replace(/"/g, '&quot;')})" style="cursor:pointer;" title="Seen list">👁️ ${seenCount}</span> <span id="tick_${key}">${tickSymbol}</span> <span onclick="event.stopPropagation(); copyMessageText('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Copy">📋</span> ${editBtnHtml} <span onclick="event.stopPropagation(); pinMessage('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Pin">📌</span> <span onclick="event.stopPropagation(); starMessage('${rawCleanText}', '${sender}')" style="cursor:pointer; margin-left:3px;" title="Star">⭐</span> <span onclick="event.stopPropagation(); openForwardModal('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Forward">➡️</span> <span onclick="event.stopPropagation(); deleteForEveryone('${key}', '${sender}')" style="cursor:pointer; margin-left:3px; color:#ef4444;" title="Delete">🗑️</span>`;
                 box.appendChild(timeDiv);
 
                 let reactBar = document.createElement('div');
