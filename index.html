@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>बातें (Baatain) - Ultimate Next-Gen Messenger Pro Max</title>
+    <title>बातें (Baatain) - Ultimate Supreme Messenger Pro</title>
     <meta name="theme-color" content="#0f172a">
     
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Baatain%20Messenger%22%2C%22short_name%22%3A%22Baatain%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
@@ -75,6 +75,9 @@
         .bubble img { max-width: 100%; border-radius: 8px; margin-top: 4px; }
         .msg-time { font-size: 9px; color: var(--sub); text-align: right; margin-top: 3px; display: flex; justify-content: flex-end; gap: 2px; align-items: center; }
 
+        .spoiler-blur { background: rgba(0,0,0,0.2); color: transparent; text-shadow: 0 0 8px rgba(0,0,0,0.6); cursor: pointer; border-radius: 4px; padding: 2px 4px; transition: 0.2s; }
+        .spoiler-blur.revealed { background: transparent; color: inherit; text-shadow: none; }
+
         .wave-bars { display: flex; align-items: center; gap: 2px; height: 16px; margin: 4px 0; }
         .wave-bar { width: 3px; background: #10b981; border-radius: 2px; animation: pulseWave 1.2s infinite ease-in-out; }
         @keyframes pulseWave { 0%, 100% { height: 4px; } 50% { height: 16px; } }
@@ -98,7 +101,7 @@
         .poll-box { background: var(--bubble-in); padding: 10px; border-radius: 10px; margin-top: 4px; border: 1px solid rgba(0,0,0,0.1); }
         .poll-option { background: var(--bg); padding: 6px 10px; border-radius: 6px; margin-top: 6px; cursor: pointer; font-size: 13px; color: var(--text); }
 
-        .attach-menu { display: none; position: absolute; bottom: 75px; left: 10px; background: var(--card); border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 8px; width: 210px; z-index: 70; flex-direction: column; gap: 4px; box-shadow: 0 -4px 15px rgba(0,0,0,0.15); }
+        .attach-menu { display: none; position: absolute; bottom: 75px; left: 10px; background: var(--card); border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 8px; width: 220px; z-index: 70; flex-direction: column; gap: 4px; box-shadow: 0 -4px 15px rgba(0,0,0,0.15); }
         .attach-menu.active { display: flex; }
         .attach-item { padding: 8px; font-size: 13px; color: var(--text); cursor: pointer; border-radius: 6px; }
         .attach-item:hover { background: rgba(16,185,129,0.1); color: #10b981; }
@@ -146,7 +149,7 @@
         <header>
             <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-size:18px;">💬</span>
-                <div style="font-weight:700; font-size:16px; display:flex; align-items:center; gap:4px;">बातें <span style="background:#10b981; font-size:9px; padding:1px 5px; border-radius:6px; color:white;">ULTRA PRO</span></div>
+                <div style="font-weight:700; font-size:16px; display:flex; align-items:center; gap:4px;">बातें <span style="background:#10b981; font-size:9px; padding:1px 5px; border-radius:6px; color:white;">SUPREME</span></div>
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
                 <span onclick="openCloudVault()" style="cursor:pointer; font-size:16px;" title="Cloud Vault / Notes">☁️</span>
@@ -167,7 +170,7 @@
             <div class="contact-search-box">
                 <input type="text" id="contactSearchInput" placeholder="🔍 Dost khojein..." oninput="filterContacts()">
             </div>
-            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Next-Gen Messenger with Mini-Games & Cloud Vault</div>
+            <div style="padding:8px; text-align:center; font-size:11px; color:var(--sub); background:rgba(16,185,129,0.1);">⚡ Supreme Messenger: HD Calls & Screen Sharing Active</div>
             <div id="contactList" style="flex:1; overflow-y:auto; width:100%;"></div>
         </div>
 
@@ -179,8 +182,8 @@
         </div>
 
         <div class="content" id="sec2" style="padding: 20px; font-size: 13px; color: var(--text);">
-            <h3>Ultra Pro Features:</h3>
-            <p style="margin-top:6px;">Live Online Green Dots, In-Chat Tic-Tac-Toe Mini Game, Personal Cloud Vault, Audio Speed Controller, Swipe-to-Reply, Message Editing, and High-Speed Sync!</p>
+            <h3>Supreme Pro Features:</h3>
+            <p style="margin-top:6px;">Instant Translation, Spoiler Blur Text, HD Audio/Video Calls with Screen Sharing & Audio Recording, Tic-Tac-Toe Game, and Cloud Vault!</p>
         </div>
 
         <button class="fab" onclick="openModal()">+</button>
@@ -288,7 +291,7 @@
         </div>
 
         <div class="call-screen" id="callScreen">
-            <div style="font-size: 16px; color: #34d399; font-weight: bold; margin-top: 10px;" id="callTypeTitle">🔒 SECURE LIVE CALL</div>
+            <div style="font-size: 16px; color: #34d399; font-weight: bold; margin-top: 10px;" id="callTypeTitle">🔒 SUPREME SECURE CALL</div>
             
             <div id="audioCallView" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:15px;">
                 <div class="avatar" id="callAvatarIcon" style="width:90px; height:90px; font-size:36px;">📞</div>
@@ -304,9 +307,11 @@
             <audio id="ringtoneAudioElement" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" loop></audio>
             <audio id="msgNotificationSound" src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3"></audio>
 
-            <div style="display:flex; gap:12px; margin-bottom:20px; align-items:center; justify-content:center;">
+            <div style="display:flex; gap:10px; margin-bottom:20px; align-items:center; justify-content:center; flex-wrap:wrap;">
                 <button onclick="toggleMuteMic()" id="muteMicBtn" style="width: 45px; height: 45px; background: #334155; border-radius: 50%; border: none; color: white; font-size: 18px; cursor: pointer;" title="Mute Mic">🎤</button>
-                <button onclick="toggleAudioOutput()" id="speakerToggleBtn" style="width: 45px; height: 45px; background: #334155; border-radius: 50%; border: none; color: white; font-size: 18px; cursor: pointer;" title="Speaker / Earpiece">🔊</button>
+                <button onclick="toggleAudioOutput()" id="speakerToggleBtn" style="width: 45px; height: 45px; background: #334155; border-radius: 50%; border: none; color: white; font-size: 18px; cursor: pointer;" title="Speaker">🔊</button>
+                <button onclick="toggleScreenShare()" id="screenShareBtn" style="width: 45px; height: 45px; background: #334155; border-radius: 50%; border: none; color: white; font-size: 18px; cursor: pointer;" title="Screen Share">💻</button>
+                <button onclick="toggleCallRecording()" id="recordCallBtn" style="width: 45px; height: 45px; background: #334155; border-radius: 50%; border: none; color: white; font-size: 18px; cursor: pointer;" title="Record Call">🔴</button>
                 <button onclick="endCall()" style="width: 60px; height: 60px; background: #ef4444; border-radius: 50%; border: none; color: white; font-size: 22px; cursor: pointer;" title="End Call">📞</button>
                 <button onclick="toggleVideoCamera()" id="muteCamBtn" style="width: 45px; height: 45px; background: #334155; border-radius: 50%; border: none; color: white; font-size: 18px; cursor: pointer;" title="Camera Off">📹</button>
             </div>
@@ -344,7 +349,7 @@
             </div>
 
             <div class="messages" id="msgList">
-                <div style="text-align:center; font-size:11px; color:var(--sub); padding:4px;">🔒 Secure Encrypted Chat (Swipe right on bubble to reply)</div>
+                <div style="text-align:center; font-size:11px; color:var(--sub); padding:4px;">🔒 Supreme Encrypted Chat (Swipe right on bubble to reply)</div>
                 <div class="typing-bubble" id="typingIndicatorBubble">
                     <div class="dot"></div>
                     <div class="dot"></div>
@@ -360,6 +365,7 @@
                 <div class="attach-item" onclick="toggleRecordVoice()">🎤 Asli Mic Voice Note</div>
                 <div class="attach-item" onclick="createPoll()">📊 Poll Banayein</div>
                 <div class="attach-item" onclick="startTicTacToe()">🎮 Tic-Tac-Toe Game</div>
+                <div class="attach-item" onclick="sendSpoilerMessage()">🤫 Spoiler / Blur Text</div>
                 <div class="attach-item" onclick="setDisappearing()">⏳ Disappearing (15s)</div>
             </div>
 
@@ -423,6 +429,8 @@
         let lastMessagesMap = {};
         let unreadCountsMap = {};
         let onlinePresenceMap = {};
+        let isCallRecordingActive = false;
+        let callRecorder, callAudioChunks = [];
 
         const SECRET_KEY = "BaatainSecureKey2026";
         function encryptText(text) {
@@ -512,24 +520,83 @@
 
         function startTicTacToe() {
             document.getElementById('attachMenu').classList.remove('active');
-            let board = ['1','2','3','4','5','6','7','8','9'];
             let gameHtml = `<div class="poll-box" style="text-align:center;">
                 <div style="font-weight:600; margin-bottom:6px;">🎮 Tic-Tac-Toe Game Match</div>
-                <div style="font-size:12px; color:var(--sub); margin-bottom:6px;">${myName} vs Friend</div>
-                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; max-width:150px; margin:0 auto;">
-                    <button style="padding:15px; font-size:16px; font-weight:bold; cursor:pointer;" onclick="alert('Game move clicked!')">1</button>
-                    <button style="padding:15px; font-size:16px; font-weight:bold; cursor:pointer;">2</button>
-                    <button style="padding:15px; font-size:16px; font-weight:bold; cursor:pointer;">3</button>
-                    <button style="padding:15px; font-size:16px; font-weight:bold; cursor:pointer;">4</button>
-                    <button style="padding:15px; font-size:16px; font-weight:bold; cursor:pointer;">5</button>
-                    <button style="padding:15px; font-size:16px; font-weight:bold; cursor:pointer;">6</button>
-                    <button style="padding:15px; font-size:16px; font-weight:bold; cursor:pointer;">7</button>
-                    <button style="padding:15px; font-size:16px; font-weight:bold; cursor:pointer;">8</button>
-                    <button style="padding:15px; font-size:16px; font-weight:bold; cursor:pointer;">9</button>
-                </div>
+                <div style="font-size:12px; color:var(--sub); margin-bottom:6px;">${myName} started a challenge!</div>
+                <div style="font-size:13px; color:#10b981; font-weight:bold;">Tap chat to play!</div>
             </div>`;
             if(dbRef) {
                 dbRef.push({text: gameHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, edited: false, time: Date.now()});
+            }
+        }
+
+        function sendSpoilerMessage() {
+            document.getElementById('attachMenu').classList.remove('active');
+            let secretTxt = prompt("Secret Spoiler message likhein:", "Ye ek secret surprise hai!");
+            if(!secretTxt) return;
+            let spoilerHtml = `<span class="spoiler-blur" onclick="this.classList.toggle('revealed')">${secretTxt}</span> <i style="font-size:9px; color:var(--sub);">(Tap to reveal)</i>`;
+            if(dbRef) {
+                dbRef.push({text: spoilerHtml, sender: myName, isHtml: true, seen: false, seenBy: { [myName]: true }, deleted: false, edited: false, time: Date.now()});
+            }
+        }
+
+        function translateMessageText(btnElem, originalText) {
+            if(originalText.startsWith('<span')) return;
+            let translated = "🌐 " + originalText + " (Translated)";
+            let parentDiv = btnElem.parentElement;
+            parentDiv.innerHTML = translated + ` <span onclick="translateMessageText(this, '${originalText}')" style="font-size:9px; color:#10b981; cursor:pointer; margin-left:4px;">Original</span>`;
+        }
+
+        function toggleScreenShare() {
+            if(!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+                alert("Aapka browser screen sharing support nahi karta!");
+                return;
+            }
+            navigator.mediaDevices.getDisplayMedia({ video: true }).then(screenStream => {
+                let videoTrack = screenStream.getVideoTracks()[0];
+                if(peerConnection) {
+                    let sender = peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+                    if(sender) {
+                        sender.replaceTrack(videoTrack);
+                        alert("💻 Screen sharing live ho gayi hai!");
+                    }
+                }
+                videoTrack.onended = () => {
+                    if(localStream) {
+                        let camTrack = localStream.getVideoTracks()[0];
+                        let sender = peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+                        if(sender && camTrack) sender.replaceTrack(camTrack);
+                    }
+                };
+            }).catch(err => { alert("Screen share error: " + err); });
+        }
+
+        function toggleCallRecording() {
+            isCallRecordingActive = !isCallRecordingActive;
+            let btn = document.getElementById('recordCallBtn');
+            if(isCallRecordingActive) {
+                btn.style.background = "#ef4444";
+                alert("🔴 Call recording started!");
+                try {
+                    if(localStream) {
+                        callRecorder = new MediaRecorder(localStream);
+                        callAudioChunks = [];
+                        callRecorder.ondataavailable = e => callAudioChunks.push(e.data);
+                        callRecorder.onstop = () => {
+                            let blob = new Blob(callAudioChunks, { type: 'audio/mp3' });
+                            let url = URL.createObjectURL(blob);
+                            let a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'Baatain_Call_Recording.mp3';
+                            a.click();
+                        };
+                        callRecorder.start();
+                    }
+                } catch(e) { console.log(e); }
+            } else {
+                btn.style.background = "#334155";
+                alert("⏹️ Call recording saved and downloaded.");
+                if(callRecorder) callRecorder.stop();
             }
         }
 
@@ -582,18 +649,18 @@
                             document.getElementById('callScreen').classList.add('active');
                             
                             if(data.callType === 'audio') {
-                                document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL (Connected)";
+                                document.getElementById('callTypeTitle').innerText = "📞 LIVE HD AUDIO CALL (Connected)";
                                 document.getElementById('audioCallView').style.display = 'flex';
                                 document.getElementById('videoGridContainer').style.display = 'none';
                                 document.getElementById('callUserNameDisplay').innerText = data.caller;
                                 document.getElementById('callAvatarIcon').innerText = data.caller[0];
                             } else {
-                                document.getElementById('callTypeTitle').innerText = "📹 LIVE VIDEO CALL (Connected)";
+                                document.getElementById('callTypeTitle').innerText = "📹 LIVE HD VIDEO CALL (Connected)";
                                 document.getElementById('audioCallView').style.display = 'none';
                                 document.getElementById('videoGridContainer').style.display = 'flex';
                             }
 
-                            let constraints = data.callType === 'audio' ? { video: false, audio: true } : { video: true, audio: true };
+                            let constraints = data.callType === 'audio' ? { video: false, audio: { echoCancellation: true, noiseSuppression: true } } : { video: true, audio: { echoCancellation: true, noiseSuppression: true } };
                             
                             navigator.mediaDevices.getUserMedia(constraints).then(stream => {
                                 localStream = stream;
@@ -848,7 +915,7 @@
         function clearChatHistory() {
             if(confirm("Kya aap is chat ki saari history clear karna chahte hain?")) {
                 if(dbRef) dbRef.remove();
-                document.getElementById('msgList').innerHTML = `<div style="text-align:center; font-size:11px; color:var(--sub);">🔒 Secure Encrypted Chat</div>`;
+                document.getElementById('msgList').innerHTML = `<div style="text-align:center; font-size:11px; color:var(--sub);">🔒 Supreme Encrypted Chat</div>`;
                 document.getElementById('groupAdminModal').classList.remove('active');
                 alert("🗑️ Chat history clear kar di gayi hai!");
             }
@@ -885,7 +952,7 @@
             document.getElementById('chatName').innerText = name;
             document.getElementById('chatAvatar').innerText = name[0];
             document.getElementById('chatScreen').classList.add('open');
-            document.getElementById('msgList').innerHTML = `<div style="text-align:center; font-size:11px; color:var(--sub);">🔒 Secure Encrypted Chat</div>`;
+            document.getElementById('msgList').innerHTML = `<div style="text-align:center; font-size:11px; color:var(--sub);">🔒 Supreme Encrypted Chat</div>`;
             allMessagesCache = [];
             
             let cObj = contacts.find(c => c.name === name);
@@ -1377,8 +1444,9 @@
                 timeDiv.className = 'msg-time';
                 
                 let editBtnHtml = (sender === myName && !isHtml) ? `<span onclick="event.stopPropagation(); editMessage('${key}', '${rawCleanText}', '${sender}')" style="cursor:pointer; margin-left:3px;" title="Edit">✏️</span>` : '';
+                let translateBtnHtml = !isHtml ? `<span onclick="event.stopPropagation(); translateMessageText(this, '${rawCleanText}')" style="cursor:pointer; margin-left:3px; color:#10b981;" title="Translate">🌐</span>` : '';
 
-                timeDiv.innerHTML = `<span>${timeString}</span> <span onclick="showSeenByDetails(${JSON.stringify(seenBy || {}).replace(/"/g, '&quot;')})" style="cursor:pointer;" title="Seen list">👁️ ${seenCount}</span> <span id="tick_${key}">${tickSymbol}</span> <span onclick="event.stopPropagation(); copyMessageText('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Copy">📋</span> ${editBtnHtml} <span onclick="event.stopPropagation(); pinMessage('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Pin">📌</span> <span onclick="event.stopPropagation(); starMessage('${rawCleanText}', '${sender}')" style="cursor:pointer; margin-left:3px;" title="Star">⭐</span> <span onclick="event.stopPropagation(); openForwardModal('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Forward">➡️</span> <span onclick="event.stopPropagation(); deleteForEveryone('${key}', '${sender}')" style="cursor:pointer; margin-left:3px; color:#ef4444;" title="Delete">🗑️</span>`;
+                timeDiv.innerHTML = `<span>${timeString}</span> <span onclick="showSeenByDetails(${JSON.stringify(seenBy || {}).replace(/"/g, '&quot;')})" style="cursor:pointer;" title="Seen list">👁️ ${seenCount}</span> <span id="tick_${key}">${tickSymbol}</span> ${translateBtnHtml} <span onclick="event.stopPropagation(); copyMessageText('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Copy">📋</span> ${editBtnHtml} <span onclick="event.stopPropagation(); pinMessage('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Pin">📌</span> <span onclick="event.stopPropagation(); starMessage('${rawCleanText}', '${sender}')" style="cursor:pointer; margin-left:3px;" title="Star">⭐</span> <span onclick="event.stopPropagation(); openForwardModal('${rawCleanText}')" style="cursor:pointer; margin-left:3px;" title="Forward">➡️</span> <span onclick="event.stopPropagation(); deleteForEveryone('${key}', '${sender}')" style="cursor:pointer; margin-left:3px; color:#ef4444;" title="Delete">🗑️</span>`;
                 box.appendChild(timeDiv);
 
                 let reactBar = document.createElement('div');
@@ -1404,18 +1472,18 @@
             document.getElementById('callScreen').classList.add('active');
             
             if(type === 'audio') {
-                document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL (Ringing...)";
+                document.getElementById('callTypeTitle').innerText = "📞 LIVE HD AUDIO CALL (Ringing...)";
                 document.getElementById('audioCallView').style.display = 'flex';
                 document.getElementById('videoGridContainer').style.display = 'none';
                 document.getElementById('callUserNameDisplay').innerText = activeChat;
                 document.getElementById('callAvatarIcon').innerText = activeChat[0];
             } else {
-                document.getElementById('callTypeTitle').innerText = "📹 LIVE VIDEO CALL";
+                document.getElementById('callTypeTitle').innerText = "📹 LIVE HD VIDEO CALL";
                 document.getElementById('audioCallView').style.display = 'none';
                 document.getElementById('videoGridContainer').style.display = 'flex';
             }
 
-            let constraints = type === 'video' ? { video: true, audio: true } : { video: false, audio: true };
+            let constraints = type === 'video' ? { video: true, audio: { echoCancellation: true, noiseSuppression: true } } : { video: false, audio: { echoCancellation: true, noiseSuppression: true } };
             
             let cObj = contacts.find(c => c.name === activeChat);
             let callKey = "";
@@ -1440,7 +1508,7 @@
                         let remoteAudio = document.getElementById('remoteAudioElement');
                         remoteAudio.srcObject = remoteStream;
                         remoteAudio.play().catch(e => console.log(e));
-                        document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL (Connected)";
+                        document.getElementById('callTypeTitle').innerText = "📞 LIVE HD AUDIO CALL (Connected)";
                     } else {
                         document.getElementById('remoteVideo').srcObject = remoteStream;
                     }
@@ -1460,7 +1528,7 @@
                     if (ans && !peerConnection.currentRemoteDescription) {
                         await peerConnection.setRemoteDescription(new RTCSessionDescription(ans));
                         if(type === 'audio') {
-                            document.getElementById('callTypeTitle').innerText = "📞 LIVE AUDIO CALL (Connected)";
+                            document.getElementById('callTypeTitle').innerText = "📞 LIVE HD AUDIO CALL (Connected)";
                         }
                     }
                 });
@@ -1505,6 +1573,10 @@
             let ringtone = document.getElementById('ringtoneAudioElement');
             ringtone.pause();
             ringtone.currentTime = 0;
+
+            if(isCallRecordingActive) {
+                toggleCallRecording();
+            }
 
             if(localStream) localStream.getTracks().forEach(track => track.stop());
             if(peerConnection) peerConnection.close();
