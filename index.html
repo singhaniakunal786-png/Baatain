@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-    <title>बातें (Baatain) - Ultra-Luxury Cyber Messenger Pro</title>
+    <title>बात-चीत (Baat-Cheet) - Ultra-Luxury Cyber Messenger Pro</title>
     <meta name="theme-color" content="#090d16">
-    <meta name="description" content="Ultimate Next-Gen Luxury Cyber Messenger with HD Calls and Cloud Vault">
+    <meta name="description" content="Ultimate Next-Gen Desi Messenger with HD Calls and Cyber-Lux Features">
     
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Baatain%20Messenger%22%2C%22short_name%22%3A%22Baatain%22%2C%22description%22%3A%22Ultimate%20Next-Gen%20Luxury%20Cyber%20Messenger%20with%20HD%20Calls%20and%20Cloud%20Vault%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23090d16%22%2C%22theme_color%22%3A%22%23090d16%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F733%2F733585.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F733%2F733585.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+    <link rel="manifest" href="manifest.json">
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -34,7 +34,7 @@
         .cyber-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 24px; padding: 35px 25px; width: 100%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 15px rgba(16,185,129,0.1); display: flex; flex-direction: column; align-items: center; animation: floatCard 4s ease-in-out infinite alternate; }
         @keyframes floatCard { 0% { transform: translateY(0px); } 100% { transform: translateY(-8px); } }
 
-        .brand-title { font-size: 34px; font-weight: 800; color: #10b981; margin-bottom: 8px; letter-spacing: 0.5px; text-shadow: 0 0 20px rgba(16,185,129,0.6); }
+        .brand-title { font-size: 30px; font-weight: 800; color: #10b981; margin-bottom: 8px; letter-spacing: 0.5px; text-shadow: 0 0 20px rgba(16,185,129,0.6); }
         .brand-subtitle { color: #94a3b8; font-size: 13px; margin-bottom: 25px; line-height: 1.4; }
         
         .cyber-input { width: 100%; padding: 14px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.15); background: rgba(15, 23, 42, 0.8); color: white; font-size: 15px; text-align: center; outline: none; margin-bottom: 18px; transition: 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
@@ -154,7 +154,7 @@
         <!-- Ultra-Luxury Cyber Glassmorphism Login & Welcome Screen -->
         <div class="screen" id="loginScreen">
             <div class="cyber-card">
-                <div class="brand-title">💬 बातें (Baatain)</div>
+                <div class="brand-title">💬 baat-cheet</div>
                 <p class="brand-subtitle">Next-Gen Luxury Cyber Messenger<br>Fast, Secure & Feature-Packed</p>
                 <input type="text" id="userNameInput" class="cyber-input" placeholder="Apna Unique Naam Daalein..." onkeypress="if(event.key=='Enter')startApp()">
                 <button class="cyber-btn" onclick="startApp()">🚀 App Shuru Karein</button>
@@ -164,7 +164,7 @@
         <header>
             <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-size:18px;">💬</span>
-                <div style="font-weight:700; font-size:16px; display:flex; align-items:center; gap:4px;">बातें <span style="background:#10b981; font-size:9px; padding:1px 5px; border-radius:6px; color:white;">ULTRA</span></div>
+                <div style="font-weight:700; font-size:15px; display:flex; align-items:center; gap:4px;">baat-cheet <span style="background:#10b981; font-size:9px; padding:1px 5px; border-radius:6px; color:white;">ULTRA</span></div>
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
                 <span onclick="openCloudVault()" style="cursor:pointer; font-size:16px;" title="Cloud Vault / Notes">☁️</span>
@@ -427,14 +427,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let myName = localStorage.getItem('baatain_username') || "";
-        let myBio = localStorage.getItem('baatain_bio') || "Cloud User 🚀";
+        let myName = localStorage.getItem('baatcheet_username') || "";
+        let myBio = localStorage.getItem('baatcheet_bio') || "Cloud User 🚀";
         let hideOnlineStatus = false;
         let contacts = [
             {name: "Global Public Room", type: "group", admin: "System", members: ["System"]}
         ];
         let blockedUsers = [];
-        let starredMessages = JSON.parse(localStorage.getItem('baatain_starred') || '[]');
+        let starredMessages = JSON.parse(localStorage.getItem('baatcheet_starred') || '[]');
         let activeChat = null, dbRef = null, typingRef = null, presenceRef = null, disappearActive = false;
         let replyingTo = null;
         let messageToForward = null;
@@ -447,7 +447,7 @@
         let isCallRecordingActive = false;
         let callRecorder, callAudioChunks = [];
 
-        const SECRET_KEY = "BaatainSecureKey2026";
+        const SECRET_KEY = "BaatCheetSecureKey2026";
         function encryptText(text) {
             try { return btoa(encodeURIComponent(text).split('').map((char, index) => String.fromCharCode(char.charCodeAt(0) ^ SECRET_KEY.charCodeAt(index % SECRET_KEY.length))).join('')); } catch(e) { return text; }
         }
@@ -458,7 +458,7 @@
         let localStream, remoteStream, peerConnection;
         const servers = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
 
-        let savedWallpaper = localStorage.getItem('baatain_wallpaper');
+        let savedWallpaper = localStorage.getItem('baatcheet_wallpaper');
         if(savedWallpaper) {
             document.addEventListener("DOMContentLoaded", () => {
                 let screen = document.getElementById('chatScreen');
@@ -484,7 +484,7 @@
             let uName = document.getElementById('userNameInput').value.trim();
             if(!uName) return alert("Kripya apna naam ya ID daalein!");
             myName = uName;
-            localStorage.setItem('baatain_username', myName);
+            localStorage.setItem('baatcheet_username', myName);
             document.getElementById('loginScreen').style.display = 'none';
 
             db.ref("users/" + myName.replace(/[^a-zA-Z0-9]/g, '_')).set({
@@ -525,7 +525,7 @@
 
         function logoutApp() {
             if(presenceRef) presenceRef.set({ status: "offline", lastSeen: Date.now() });
-            localStorage.removeItem('baatain_username');
+            localStorage.removeItem('baatcheet_username');
             location.reload();
         }
 
@@ -602,7 +602,7 @@
                             let url = URL.createObjectURL(blob);
                             let a = document.createElement('a');
                             a.href = url;
-                            a.download = 'Baatain_Call_Recording.mp3';
+                            a.download = 'BaatCheet_Call_Recording.mp3';
                             a.click();
                         };
                         callRecorder.start();
@@ -804,7 +804,7 @@
             hideOnlineStatus = document.getElementById('hideOnlineToggle').checked;
             if(b) {
                 myBio = b;
-                localStorage.setItem('baatain_bio', myBio);
+                localStorage.setItem('baatcheet_bio', myBio);
             }
             document.getElementById('profileModal').classList.remove('active');
             
@@ -825,7 +825,7 @@
                 screen.style.backgroundImage = 'none';
                 screen.style.backgroundColor = val;
             }
-            localStorage.setItem('baatain_wallpaper', val);
+            localStorage.setItem('baatcheet_wallpaper', val);
             document.getElementById('wallpaperModal').classList.remove('active');
         }
 
@@ -836,7 +836,7 @@
             reader.onload = function(evt) {
                 let screen = document.getElementById('chatScreen');
                 screen.style.backgroundImage = `url('${evt.target.result}')`;
-                localStorage.setItem('baatain_wallpaper', evt.target.result);
+                localStorage.setItem('baatcheet_wallpaper', evt.target.result);
                 document.getElementById('wallpaperModal').classList.remove('active');
                 alert("✨ Gallery photo successfully saved as permanent wallpaper!");
             };
@@ -1374,7 +1374,7 @@
         function starMessage(txt, sender) {
             if(!starredMessages.some(m => m.text === txt)) {
                 starredMessages.push({text: txt, sender: sender});
-                localStorage.setItem('baatain_starred', JSON.stringify(starredMessages));
+                localStorage.setItem('baatcheet_starred', JSON.stringify(starredMessages));
                 alert("⭐ Message Starred messages mein jod diya gaya hai!");
             } else {
                 alert("Yeh message pehle se starred hai.");
